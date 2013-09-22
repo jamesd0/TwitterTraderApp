@@ -74,6 +74,14 @@ public class CompanyControllerTest {
                 .andExpect(jsonPath("$[0].industry.name", is(first.getIndustry().getName())))
                 .andExpect(
                         jsonPath("$[0].industry.description", is(first.getIndustry()
+                                .getDescription())))
+                .andExpect(jsonPath("$[1].id", is((int) second.getId())))
+                .andExpect(jsonPath("$[1].description", is(second.getDescription())))
+                .andExpect(jsonPath("$[1].name", is(second.getName())))
+                .andExpect(jsonPath("$[1].industry.id", is((int) second.getIndustry().getId())))
+                .andExpect(jsonPath("$[1].industry.name", is(second.getIndustry().getName())))
+                .andExpect(
+                        jsonPath("$[1].industry.description", is(second.getIndustry()
                                 .getDescription())));
         verify(companyService, times(1)).selectAll();
         verifyNoMoreInteractions(companyService);
