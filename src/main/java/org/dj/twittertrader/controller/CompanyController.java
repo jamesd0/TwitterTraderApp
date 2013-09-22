@@ -7,12 +7,14 @@ import org.dj.twittertrader.service.CompanyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * The Class CompanyController is a REST api to control the Company Entity.
@@ -45,13 +47,11 @@ public class CompanyController {
      * 
      * @param company
      *            the company to delete
-     * @return the string
      */
     @RequestMapping(value = "/deleteCompany", method = RequestMethod.DELETE)
-    @ResponseBody
-    public final String deleteCompany(@RequestBody final Company company) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public final void deleteCompany(@RequestBody final Company company) {
         companyService.delete(company);
-        return "Company deleted with id: " + company.getId();
     }
 
     /**
@@ -59,13 +59,11 @@ public class CompanyController {
      * 
      * @param company
      *            the company
-     * @return the string
      */
     @RequestMapping(value = "/createCompany", method = RequestMethod.POST)
-    @ResponseBody
-    public final String createCompany(@RequestBody final Company company) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public final void createCompany(@RequestBody final Company company) {
         companyService.create(company);
-        return "Company created successfully";
     }
 
     /**
@@ -73,13 +71,11 @@ public class CompanyController {
      * 
      * @param company
      *            the updated company object
-     * @return the string
      */
     @RequestMapping(value = "/updateCompany", method = RequestMethod.PUT)
-    @ResponseBody
-    public final String updateCompany(@RequestBody final Company company) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public final void updateCompany(@RequestBody final Company company) {
         companyService.update(company);
-        return "Company created successfully";
     }
 
     /**
@@ -95,5 +91,15 @@ public class CompanyController {
         Company company = companyService.select(id);
         return company;
 
+    }
+
+    /**
+     * Sets the company service.
+     * 
+     * @param companyService
+     *            the companyService to set
+     */
+    public final void setCompanyService(final CompanyService companyService) {
+        this.companyService = companyService;
     }
 }

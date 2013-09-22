@@ -21,7 +21,6 @@ import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
 
-// TODO: Auto-generated Javadoc
 /**
  * The listener interface for receiving twitterStatus events. The class that is
  * interested in processing a twitterStatus event implements this interface, and
@@ -170,7 +169,7 @@ public class TwitterStatusListener implements StatusListener {
      * 
      * @return true, if is initialiased
      */
-    public boolean isInitialiased() {
+    public final boolean isInitialiased() {
         return initialised;
     }
 
@@ -180,7 +179,7 @@ public class TwitterStatusListener implements StatusListener {
      * @param initialiased
      *            the new initialiased
      */
-    public void setInitialiased(boolean initialiased) {
+    public final void setInitialiased(final boolean initialiased) {
         this.initialised = initialiased;
     }
 
