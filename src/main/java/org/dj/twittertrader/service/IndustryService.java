@@ -41,4 +41,6 @@ public interface IndustryService {
      */
     void update(Industry industry);
 
+    void create(Industry industry);
+
 }

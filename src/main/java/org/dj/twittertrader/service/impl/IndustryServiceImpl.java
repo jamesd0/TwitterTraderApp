@@ -80,4 +80,11 @@ public class IndustryServiceImpl implements IndustryService {
         industryDAO.update(industry);
 
     }
+
+    @Override
+    @Transactional
+    public void create(Industry industry) {
+        industryDAO.create(industry);
+
+    }
 }
