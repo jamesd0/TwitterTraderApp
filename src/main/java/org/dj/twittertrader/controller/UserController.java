@@ -7,12 +7,14 @@ import org.dj.twittertrader.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * The Class UserController.
@@ -43,13 +45,11 @@ public class UserController {
      * 
      * @param user
      *            the user to delete
-     * @return the string
      */
     @RequestMapping(value = "/deleteUser", method = RequestMethod.DELETE)
-    @ResponseBody
-    public final String deleteUser(@RequestBody final User user) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public final void deleteUser(@RequestBody final User user) {
         userService.delete(user);
-        return "User deleted with id: " + user.getId();
     }
 
     /**
@@ -57,13 +57,11 @@ public class UserController {
      * 
      * @param user
      *            the user
-     * @return the string
      */
     @RequestMapping(value = "/createUser", method = RequestMethod.POST)
-    @ResponseBody
-    public final String createUser(@RequestBody final User user) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public final void createUser(@RequestBody final User user) {
         userService.create(user);
-        return "User created successfully";
     }
 
     /**
@@ -71,13 +69,11 @@ public class UserController {
      * 
      * @param user
      *            the updated user object
-     * @return the string
      */
     @RequestMapping(value = "/updateUser", method = RequestMethod.PUT)
-    @ResponseBody
-    public final String updateUser(@RequestBody final User user) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public final void updateUser(@RequestBody final User user) {
         userService.update(user);
-        return "User updated successfully";
     }
 
     /**
@@ -91,5 +87,16 @@ public class UserController {
     @ResponseBody
     public final User selectUser(@PathVariable final long id) {
         return userService.select(id);
+    }
+
+    /**
+     * Sets the user service.
+     * 
+     * @param userService2
+     *            the new user service
+     */
+    public final void setUserService(final UserService userService2) {
+        userService = userService2;
+
     }
 }

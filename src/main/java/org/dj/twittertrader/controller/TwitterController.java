@@ -68,15 +68,6 @@ public class TwitterController {
     }
 
     /**
-     * Gets the listener.
-     * 
-     * @return the listener
-     */
-    public final TwitterStatusListener getListener() {
-        return listener;
-    }
-
-    /**
      * Sets the listener.
      * 
      * @param listener
@@ -87,15 +78,6 @@ public class TwitterController {
     }
 
     /**
-     * Gets the stream.
-     * 
-     * @return the stream
-     */
-    public final TwitterStream getStream() {
-        return stream;
-    }
-
-    /**
      * Sets the stream.
      * 
      * @param stream
@@ -103,6 +85,17 @@ public class TwitterController {
      */
     public final void setStream(final TwitterStream stream) {
         this.stream = stream;
+    }
+
+    /**
+     * Sets the portfolio service.
+     * 
+     * @param portfolioService2
+     *            the new portfolio service
+     */
+    public final void setPortfolioService(final PortfolioService portfolioService2) {
+        this.portfolioService = portfolioService2;
+
     }
 
 }

@@ -7,12 +7,14 @@ import org.dj.twittertrader.service.TweetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * The Class TweetController.
@@ -43,13 +45,11 @@ public class TweetController {
      * 
      * @param tweet
      *            the tweet to delete
-     * @return the string
      */
     @RequestMapping(value = "/deleteTweet", method = RequestMethod.DELETE)
-    @ResponseBody
-    public final String deleteTweet(@RequestBody final Tweet tweet) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public final void deleteTweet(@RequestBody final Tweet tweet) {
         tweetService.delete(tweet);
-        return "Tweet deleted with id: " + tweet.getId();
     }
 
     /**
@@ -57,13 +57,11 @@ public class TweetController {
      * 
      * @param tweet
      *            the tweet
-     * @return the string
      */
     @RequestMapping(value = "/createTweet", method = RequestMethod.POST)
-    @ResponseBody
-    public final String createTweet(@RequestBody final Tweet tweet) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public final void createTweet(@RequestBody final Tweet tweet) {
         tweetService.create(tweet);
-        return "Tweet created successfully";
     }
 
     /**
@@ -71,13 +69,11 @@ public class TweetController {
      * 
      * @param tweet
      *            the updated tweet object
-     * @return the string
      */
     @RequestMapping(value = "/updateTweet", method = RequestMethod.PUT)
-    @ResponseBody
-    public final String updateTweet(@RequestBody final Tweet tweet) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public final void updateTweet(@RequestBody final Tweet tweet) {
         tweetService.update(tweet);
-        return "Tweet updated successfully";
     }
 
     /**
@@ -91,5 +87,16 @@ public class TweetController {
     @ResponseBody
     public final Tweet selectTweet(@PathVariable final long id) {
         return tweetService.select(id);
+    }
+
+    /**
+     * Sets the tweet service.
+     * 
+     * @param tweetService2
+     *            the new tweet service
+     */
+    public final void setTweetService(final TweetService tweetService2) {
+        this.tweetService = tweetService2;
+
     }
 }

@@ -10,7 +10,9 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.dj.twittertrader.dao.IndustryDAO;
+import org.dj.twittertrader.model.Company;
 import org.dj.twittertrader.model.Industry;
+import org.dj.twittertrader.service.CompanyService;
 import org.dj.twittertrader.utils.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,10 @@ public class IndustryDAOImpl implements IndustryDAO {
     /** The data source. */
     @Autowired
     private DataSource dataSource;
+
+    /** The company service. */
+    @Autowired
+    private CompanyService companyService;
 
     /** The connection. */
     private Connection connection;
@@ -130,7 +136,6 @@ public class IndustryDAOImpl implements IndustryDAO {
     @Override
     public final List<Industry> selectAll() {
         List<Industry> list = new ArrayList<Industry>();
-        Industry industry;
         String sql = "SELECT * FROM Industry where activeIndustry=1";
         LOGGER.info(sql);
         try {
@@ -138,7 +143,7 @@ public class IndustryDAOImpl implements IndustryDAO {
             statement = connection.prepareStatement(sql);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                industry = new Industry();
+                Industry industry = new Industry();
                 industry.setId(resultSet.getLong("idIndustry"));
                 industry.setName(resultSet.getString("nameIndustry"));
                 industry.setDescription(resultSet.getString("descriptionIndustry"));
@@ -151,6 +156,9 @@ public class IndustryDAOImpl implements IndustryDAO {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
             DBUtils.close(connection);
+        }
+        for (Industry industry : list) {
+            industry.setCompanies(getAllIndustryCompanies(industry.getId()));
         }
         return list;
     }
@@ -183,6 +191,35 @@ public class IndustryDAOImpl implements IndustryDAO {
             DBUtils.close(statement);
             DBUtils.close(connection);
         }
+        industry.setCompanies(getAllIndustryCompanies(industry.getId()));
         return industry;
+    }
+
+    /**
+     * Gets the all industry companies.
+     * 
+     * @param id
+     *            the id
+     * @return the all industry companies
+     */
+    private List<Company> getAllIndustryCompanies(final long id) {
+        List<Company> companies = new ArrayList<Company>();
+        String sql = "select companyIC from industry_company where industryIC=?";
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setLong(DBUtils.ONE, id);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                companies.add(companyService.select(resultSet.getLong("companyIC")));
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e.getMessage());
+        } finally {
+            DBUtils.close(resultSet);
+            DBUtils.close(statement);
+            DBUtils.close(connection);
+        }
+        return companies;
     }
 }

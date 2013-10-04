@@ -7,6 +7,7 @@ import org.dj.twittertrader.service.PortfolioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * The Class PortfolioController.
@@ -64,13 +66,11 @@ public class PortfolioController {
      * 
      * @param portfolio
      *            the portfolio to delete
-     * @return the string
      */
     @RequestMapping(value = "/deletePortfolio", method = RequestMethod.DELETE)
-    @ResponseBody
-    public final String deletePortfolio(@RequestBody final Portfolio portfolio) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public final void deletePortfolio(@RequestBody final Portfolio portfolio) {
         portfolioService.delete(portfolio);
-        return "Portfolio deleted with id: " + portfolio.getId();
     }
 
     /**
@@ -78,13 +78,11 @@ public class PortfolioController {
      * 
      * @param portfolio
      *            the portfolio
-     * @return the string
      */
     @RequestMapping(value = "/createPortfolio", method = RequestMethod.POST)
-    @ResponseBody
-    public final String createPortfolio(@RequestBody final Portfolio portfolio) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public final void createPortfolio(@RequestBody final Portfolio portfolio) {
         portfolioService.create(portfolio);
-        return "Portfolio created successfully";
     }
 
     /**
@@ -92,13 +90,11 @@ public class PortfolioController {
      * 
      * @param portfolio
      *            the updated portfolio object
-     * @return the string
      */
     @RequestMapping(value = "/updatePortfolio", method = RequestMethod.PUT)
-    @ResponseBody
-    public final String updatePortfolio(@RequestBody final Portfolio portfolio) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public final void updatePortfolio(@RequestBody final Portfolio portfolio) {
         portfolioService.update(portfolio);
-        return "Portfolio created successfully";
     }
 
     /**
@@ -114,5 +110,15 @@ public class PortfolioController {
         Portfolio portfolio = portfolioService.select(id);
         return portfolio;
 
+    }
+
+    /**
+     * Sets the portfolio service.
+     * 
+     * @param portfolioService2
+     *            the new portfolio service
+     */
+    public final void setPortfolioService(final PortfolioService portfolioService2) {
+        this.portfolioService = portfolioService2;
     }
 }

@@ -1,7 +1,6 @@
 package org.dj.twittertrader.utils;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -80,6 +79,12 @@ public final class DBUtils {
     /** The Constant TWENTYONE. */
     public static final int TWENTYONE = 21;
 
+    /** The Constant TWENTYTWO. */
+    public static final int TWENTYTWO = 22;
+
+    /** The Constant TWENTYTHREE. */
+    public static final int TWENTYTHREE = 23;
+
     /**
      * Instantiates a new dB utils.
      */
@@ -143,21 +148,5 @@ public final class DBUtils {
      */
     public static Logger getLogger() {
         return LOGGER;
-    }
-
-    /**
-     * Convert date.
-     * 
-     * @param createdAt
-     *            the created at
-     * @return the date
-     */
-    @SuppressWarnings("deprecation")
-    public static Date convertDate(final java.util.Date createdAt) {
-        if (createdAt == null) {
-            return null;
-        }
-        Date date = new Date(createdAt.getYear(), createdAt.getMonth(), createdAt.getDate());
-        return date;
     }
 }

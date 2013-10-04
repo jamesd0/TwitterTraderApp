@@ -13,6 +13,8 @@ import org.dj.twittertrader.dao.PortfolioDAO;
 import org.dj.twittertrader.model.Company;
 import org.dj.twittertrader.model.Industry;
 import org.dj.twittertrader.model.Portfolio;
+import org.dj.twittertrader.service.CompanyService;
+import org.dj.twittertrader.service.IndustryService;
 import org.dj.twittertrader.utils.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,14 @@ public class PortfolioDAOImpl implements PortfolioDAO {
     /** The data source. */
     @Autowired
     private DataSource dataSource;
+
+    /** The company service. */
+    @Autowired
+    private CompanyService companyService;
+
+    /** The industry service. */
+    @Autowired
+    private IndustryService industryService;
     /** The connection. */
     private Connection connection;
 
@@ -180,10 +190,7 @@ public class PortfolioDAOImpl implements PortfolioDAO {
      *            the portfolio
      */
     private void populatePortfolioIndustries(final Portfolio portfolio) {
-        Industry industry;
-        String sql = "select Industry.* from Industry left join portfolio_industry on"
-                + " Industry.idIndustry=portfolio_industry.industryPI"
-                + " where portfolio_industry.portfolioPI=?";
+        String sql = "select industryPI from portfolio_industry where portfolioPI=?";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
@@ -191,12 +198,8 @@ public class PortfolioDAOImpl implements PortfolioDAO {
             statement.setLong(DBUtils.ONE, portfolio.getId());
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                industry = new Industry();
-                industry.setId(resultSet.getLong("idIndustry"));
-                industry.setName(resultSet.getString("nameIndustry"));
-                industry.setDescription(resultSet.getString("descriptionIndustry"));
-                industry.setActive(resultSet.getBoolean("activeIndustry"));
-                portfolio.getIndustries().add(industry);
+                portfolio.getIndustries().add(
+                        industryService.select(resultSet.getLong("industryPI")));
             }
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());
@@ -214,13 +217,7 @@ public class PortfolioDAOImpl implements PortfolioDAO {
      *            the portfolio
      */
     private void populatePortfolioCompanies(final Portfolio portfolio) {
-        Company company = null;
-        Industry industry;
-        String sql = "select Company.*, Industry.nameIndustry, Industry.descriptionIndustry,"
-                + " Industry.activeIndustry from Company"
-                + " left join portfolio_company on Company.idCompany=portfolio_company.companyPK"
-                + " inner join Industry on Company.industry=Industry.idIndustry"
-                + " where portfolio_company.portfolioPC=?";
+        String sql = "select companyPK from portfolio_company where portfolioPC=?";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
@@ -228,19 +225,7 @@ public class PortfolioDAOImpl implements PortfolioDAO {
             statement.setLong(DBUtils.ONE, portfolio.getId());
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                industry = new Industry();
-                company = new Company();
-                company.setId(resultSet.getLong("idCompany"));
-                company.setName(resultSet.getString("nameCompany"));
-                company.setStockPrice(resultSet.getDouble("stockPrice"));
-                company.setDescription(resultSet.getString("descriptionCompany"));
-                company.setActive(resultSet.getBoolean("activeCompany"));
-                industry.setId(resultSet.getLong("industry"));
-                industry.setName(resultSet.getString("nameIndustry"));
-                industry.setDescription(resultSet.getString("descriptionIndustry"));
-                industry.setActive(resultSet.getBoolean("activeIndustry"));
-                company.setIndustry(industry);
-                portfolio.getCompanies().add(company);
+                portfolio.getCompanies().add(companyService.select(resultSet.getLong("companyPK")));
             }
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());

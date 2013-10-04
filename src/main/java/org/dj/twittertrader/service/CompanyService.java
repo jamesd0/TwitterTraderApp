@@ -2,7 +2,9 @@ package org.dj.twittertrader.service;
 
 import java.util.List;
 
+import org.dj.twittertrader.dao.CompanyDAO;
 import org.dj.twittertrader.model.Company;
+import org.dj.twittertrader.model.Tweet;
 
 /**
  * The Interface CompanyService.
@@ -48,5 +50,23 @@ public interface CompanyService {
      *            the company
      */
     void update(Company company);
+
+    /**
+     * Sets the company dao.
+     * 
+     * @param companyDAO
+     *            the new company dao
+     */
+    void setCompanyDAO(CompanyDAO companyDAO);
+
+    /**
+     * Adds the tweet to company.
+     * 
+     * @param company
+     *            the company
+     * @param tweet
+     *            the tweet
+     */
+    void addTweetToCompany(Company company, Tweet tweet);
 
 }

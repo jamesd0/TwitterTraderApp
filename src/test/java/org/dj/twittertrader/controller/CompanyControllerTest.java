@@ -61,28 +61,16 @@ public class CompanyControllerTest {
     @Test
     public final void getAllCompaniesTest() throws Exception {
         when(companyService.selectAll()).thenReturn(Arrays.asList(first, second));
-        standaloneSetup(controller)
-                .build()
-                .perform(get("/company/getAllCompanies"))
+        standaloneSetup(controller).build().perform(get("/company/getAllCompanies"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is((int) first.getId())))
+                .andExpect(jsonPath("$[0].id", is(first.getId())))
                 .andExpect(jsonPath("$[0].description", is(first.getDescription())))
                 .andExpect(jsonPath("$[0].name", is(first.getName())))
-                .andExpect(jsonPath("$[0].industry.id", is((int) first.getIndustry().getId())))
-                .andExpect(jsonPath("$[0].industry.name", is(first.getIndustry().getName())))
-                .andExpect(
-                        jsonPath("$[0].industry.description", is(first.getIndustry()
-                                .getDescription())))
-                .andExpect(jsonPath("$[1].id", is((int) second.getId())))
+                .andExpect(jsonPath("$[1].id", is(second.getId())))
                 .andExpect(jsonPath("$[1].description", is(second.getDescription())))
-                .andExpect(jsonPath("$[1].name", is(second.getName())))
-                .andExpect(jsonPath("$[1].industry.id", is((int) second.getIndustry().getId())))
-                .andExpect(jsonPath("$[1].industry.name", is(second.getIndustry().getName())))
-                .andExpect(
-                        jsonPath("$[1].industry.description", is(second.getIndustry()
-                                .getDescription())));
+                .andExpect(jsonPath("$[1].name", is(second.getName())));
         verify(companyService, times(1)).selectAll();
         verifyNoMoreInteractions(companyService);
     }
@@ -96,18 +84,12 @@ public class CompanyControllerTest {
     @Test
     public final void getCompanySuccess() throws Exception {
         when(companyService.select(1)).thenReturn(first);
-        standaloneSetup(controller)
-                .build()
-                .perform(get("/company/getCompany/1"))
+        standaloneSetup(controller).build().perform(get("/company/getCompany/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(TestUtil.APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("id", is((int) first.getId())))
+                .andExpect(jsonPath("id", is(first.getId())))
                 .andExpect(jsonPath("description", is(first.getDescription())))
-                .andExpect(jsonPath("name", is(first.getName())))
-                .andExpect(jsonPath("industry.id", is((int) first.getIndustry().getId())))
-                .andExpect(jsonPath("industry.name", is(first.getIndustry().getName())))
-                .andExpect(
-                        jsonPath("industry.description", is(first.getIndustry().getDescription())));
+                .andExpect(jsonPath("name", is(first.getName())));
         verify(companyService, times(1)).select(1);
         verifyNoMoreInteractions(companyService);
     }

@@ -1,10 +1,11 @@
 package org.dj.twittertrader.model;
 
+import java.io.IOException;
 import java.util.Date;
 
-import twitter4j.Status;
+import org.codehaus.jackson.map.ObjectMapper;
 
-import com.google.gson.Gson;
+import twitter4j.Status;
 
 /**
  * The Class Tweet.
@@ -26,8 +27,8 @@ public class Tweet {
     /** The retweet count. */
     private long retweetCount;
 
-    /** The company. */
-    private Company company;
+    /** The tweet score. */
+    private long tweetScore;
 
     /** The active. */
     private boolean active;
@@ -44,6 +45,7 @@ public class Tweet {
         text = status.getText();
         user = new User(status.getUser());
         retweetCount = status.getRetweetCount();
+        tweetScore = calculateTweetScore();
         active = true;
     }
 
@@ -52,6 +54,15 @@ public class Tweet {
      */
     public Tweet() {
         super();
+    }
+
+    /**
+     * Calculate tweet score based on tweet content.
+     * 
+     * @return the int
+     */
+    private int calculateTweetScore() {
+        return (int) ((1 + retweetCount) * text.hashCode());
     }
 
     /**
@@ -150,22 +161,22 @@ public class Tweet {
     }
 
     /**
-     * Gets the company.
+     * Gets the tweet score.
      * 
-     * @return the company
+     * @return the tweet score
      */
-    public final Company getCompany() {
-        return company;
+    public final long getTweetScore() {
+        return tweetScore;
     }
 
     /**
-     * Sets the company.
+     * Sets the tweet score.
      * 
-     * @param company
-     *            the new company
+     * @param tweetScore
+     *            the new tweet score
      */
-    public final void setCompany(final Company company) {
-        this.company = company;
+    public final void setTweetScore(final long tweetScore) {
+        this.tweetScore = tweetScore;
     }
 
     /**
@@ -193,9 +204,11 @@ public class Tweet {
      * @param json
      *            the json
      * @return the tweet
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    public static Tweet fromJson(final String json) {
-        return new Gson().fromJson(json, Tweet.class);
+    public static Tweet fromJson(final String json) throws IOException {
+        return new ObjectMapper().readValue(json, Tweet.class);
     }
 
     /**
@@ -204,9 +217,83 @@ public class Tweet {
      * @param tweet
      *            the tweet
      * @return the string
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    public static String toJson(final Tweet tweet) {
-        return new Gson().toJson(tweet);
+    public static String toJson(final Tweet tweet) throws IOException {
+        return new ObjectMapper().writeValueAsString(tweet);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (active ? 1231 : 1237);
+        result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
+        result = prime * result + (int) (id ^ (id >>> 32));
+        result = prime * result + (int) (retweetCount ^ (retweetCount >>> 32));
+        result = prime * result + ((text == null) ? 0 : text.hashCode());
+        result = (int) (prime * result + tweetScore);
+        result = prime * result + ((user == null) ? 0 : user.hashCode());
+        return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Tweet)) {
+            return false;
+        }
+        Tweet other = (Tweet) obj;
+        if (active != other.active) {
+            return false;
+        }
+        if (createdAt == null) {
+            if (other.createdAt != null) {
+                return false;
+            }
+        } else if (!createdAt.equals(other.createdAt)) {
+            return false;
+        }
+        if (id != other.id) {
+            return false;
+        }
+        if (retweetCount != other.retweetCount) {
+            return false;
+        }
+        if (text == null) {
+            if (other.text != null) {
+                return false;
+            }
+        } else if (!text.equals(other.text)) {
+            return false;
+        }
+        if (tweetScore != other.tweetScore) {
+            return false;
+        }
+        if (user == null) {
+            if (other.user != null) {
+                return false;
+            }
+        } else if (!user.equals(other.user)) {
+            return false;
+        }
+        return true;
     }
 
 }

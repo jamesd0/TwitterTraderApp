@@ -3,6 +3,7 @@
  */
 package org.dj.twittertrader.twitter;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.dj.twittertrader.messaging.MessagingBroker;
@@ -34,7 +35,7 @@ import twitter4j.StatusListener;
 public class TwitterStatusListener implements StatusListener {
 
     /** The Constant logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(TwitterStatusListener.class);
+    private Logger logger = LoggerFactory.getLogger(TwitterStatusListener.class);
 
     /** The broker. */
     @Autowired
@@ -64,8 +65,7 @@ public class TwitterStatusListener implements StatusListener {
      */
     @Override
     public final void onException(final Exception e) {
-        LOGGER.error("Twitter Exception" + e.getMessage());
-
+        logger.error("Twitter Exception: " + e.getMessage());
     }
 
     /*
@@ -76,8 +76,7 @@ public class TwitterStatusListener implements StatusListener {
      */
     @Override
     public final void onDeletionNotice(final StatusDeletionNotice notice) {
-        LOGGER.info("Twitter notice" + notice.toString());
-
+        logger.info("Twitter notice: " + notice.toString());
     }
 
     /*
@@ -87,8 +86,7 @@ public class TwitterStatusListener implements StatusListener {
      */
     @Override
     public final void onScrubGeo(final long arg0, final long arg1) {
-        LOGGER.info("ScrubGEO" + arg0, arg1);
-
+        logger.info("ScrubGEO: " + arg0 + ", " + arg1);
     }
 
     /*
@@ -98,7 +96,7 @@ public class TwitterStatusListener implements StatusListener {
      */
     @Override
     public final void onStallWarning(final StallWarning arg0) {
-        LOGGER.info("Stall warning" + arg0.getMessage());
+        logger.info("Stall warning: " + arg0.getMessage());
 
     }
 
@@ -113,16 +111,28 @@ public class TwitterStatusListener implements StatusListener {
             init();
         }
         if (status.getUser().getLang().equals("en")) {
-            LOGGER.info(status.getText());
             Tweet tweet = new Tweet(status);
             for (Company company : companies) {
-                if (tweet.getText().contains(company.getName())) {
-                    tweet.setCompany(company);
+                for (String tag : company.getStreamTokens()) {
+                    if (tweet.getText().contains(tag)) {
+                        logger.info(status.getText());
+                        userService.create(tweet.getUser());
+                        tweetService.create(tweet);
+                        company.getTweets().add(tweet);
+                        companyService.addTweetToCompany(company, tweet);
+                        company.setCompanyScore(company.calculateScore());
+                        companyService.update(company);
+                        try {
+                            // upload a better message to the queue... include
+                            // text and the
+                            // company it is about and scores
+                            broker.upload(Tweet.toJson(tweet).getBytes());
+                        } catch (IOException e) {
+                            logger.error(e.getMessage());
+                        }
+                    }
                 }
             }
-            userService.create(tweet.getUser());
-            tweetService.create(tweet);
-            broker.upload(Tweet.toJson(tweet).getBytes());
         }
     }
 
@@ -141,7 +151,7 @@ public class TwitterStatusListener implements StatusListener {
      */
     @Override
     public final void onTrackLimitationNotice(final int arg0) {
-        LOGGER.info("TrackLimitationNotice" + arg0);
+        logger.info("TrackLimitationNotice: " + arg0);
 
     }
 
@@ -181,6 +191,46 @@ public class TwitterStatusListener implements StatusListener {
      */
     public final void setInitialiased(final boolean initialiased) {
         this.initialised = initialiased;
+    }
+
+    /**
+     * Sets the tweet service.
+     * 
+     * @param tweetService2
+     *            the new tweet service
+     */
+    public final void setTweetService(final TweetService tweetService2) {
+        this.tweetService = tweetService2;
+    }
+
+    /**
+     * Sets the user service.
+     * 
+     * @param userService2
+     *            the new user service
+     */
+    public final void setUserService(final UserService userService2) {
+        this.userService = userService2;
+    }
+
+    /**
+     * Sets the company service.
+     * 
+     * @param companyService2
+     *            the new company service
+     */
+    public final void setCompanyService(final CompanyService companyService2) {
+        this.companyService = companyService2;
+    }
+
+    /**
+     * Sets the logger.
+     * 
+     * @param logger
+     *            the new logger
+     */
+    public final void setLogger(final Logger logger) {
+        this.logger = logger;
     }
 
 }

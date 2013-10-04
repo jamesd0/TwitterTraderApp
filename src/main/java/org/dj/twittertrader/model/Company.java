@@ -1,8 +1,10 @@
 package org.dj.twittertrader.model;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.Gson;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * The Class Company is an entity.
@@ -18,11 +20,20 @@ public class Company {
     /** The description. */
     private String description;
 
+    /** The tweets. */
+    private List<Tweet> tweets;
+
     /** The stock price. */
     private double stockPrice;
 
-    /** The industry. */
-    private Industry industry;
+    /**
+     * The tags. A tag is a word that is associated with the company example for
+     * CocaCola coke would be a tag
+     */
+    private List<String> tags;
+
+    /** The company score. */
+    private long companyScore;
 
     /** The active. */
     private boolean active;
@@ -32,17 +43,6 @@ public class Company {
      */
     public Company() {
         super();
-    }
-
-    /**
-     * Instantiates a new company.
-     * 
-     * @param id
-     *            the id
-     */
-    public Company(final long id) {
-        super();
-        this.id = id;
     }
 
     /**
@@ -103,6 +103,25 @@ public class Company {
     }
 
     /**
+     * Gets the tweets.
+     * 
+     * @return the tweets
+     */
+    public final List<Tweet> getTweets() {
+        return tweets;
+    }
+
+    /**
+     * Sets the tweets.
+     * 
+     * @param tweets
+     *            the new tweets
+     */
+    public final void setTweets(final List<Tweet> tweets) {
+        this.tweets = tweets;
+    }
+
+    /**
      * Gets the stock price.
      * 
      * @return the stock price
@@ -122,22 +141,39 @@ public class Company {
     }
 
     /**
-     * Gets the industry.
-     * 
-     * @return the industry
+     * @return the tags
      */
-    public final Industry getIndustry() {
-        return industry;
+    public final List<String> getTags() {
+        return tags;
     }
 
     /**
-     * Sets the industry.
+     * Sets the tags.
      * 
-     * @param industry
-     *            the new industry
+     * @param tags
+     *            the tags to set
      */
-    public final void setIndustry(final Industry industry) {
-        this.industry = industry;
+    public final void setTags(final List<String> tags) {
+        this.tags = tags;
+    }
+
+    /**
+     * Gets the company score.
+     * 
+     * @return the company score
+     */
+    public final long getCompanyScore() {
+        return companyScore;
+    }
+
+    /**
+     * Sets the company score.
+     * 
+     * @param score
+     *            the new company score
+     */
+    public final void setCompanyScore(final long score) {
+        this.companyScore = score;
     }
 
     /**
@@ -165,9 +201,11 @@ public class Company {
      * @param json
      *            the json
      * @return the company
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    public static Company fromJson(final String json) {
-        return new Gson().fromJson(json, Company.class);
+    public static Company fromJson(final String json) throws IOException {
+        return new ObjectMapper().readValue(json, Company.class);
     }
 
     /**
@@ -176,32 +214,11 @@ public class Company {
      * @param company
      *            the company
      * @return the string
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    public static String toJson(final Company company) {
-        return new Gson().toJson(company);
-    }
-
-    /**
-     * From json.
-     * 
-     * @param json
-     *            the json
-     * @return the company
-     */
-    @SuppressWarnings("unchecked")
-    public static List<Company> fromJsonList(final String json) {
-        return new Gson().fromJson(json, List.class);
-    }
-
-    /**
-     * To json.
-     * 
-     * @param companies
-     *            the companies
-     * @return the string
-     */
-    public static String toJsonList(final List<Company> companies) {
-        return new Gson().toJson(companies);
+    public static String toJson(final Company company) throws IOException {
+        return new ObjectMapper().writeValueAsString(company);
     }
 
     /*
@@ -210,17 +227,19 @@ public class Company {
      * @see java.lang.Object#hashCode()
      */
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (active ? 1231 : 1237);
+        result = (int) (prime * result + companyScore);
         result = prime * result + ((description == null) ? 0 : description.hashCode());
         result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((industry == null) ? 0 : industry.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         long temp;
         temp = Double.doubleToLongBits(stockPrice);
         result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + ((tags == null) ? 0 : tags.hashCode());
+        result = prime * result + ((tweets == null) ? 0 : tweets.hashCode());
         return result;
     }
 
@@ -230,35 +249,87 @@ public class Company {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (!(obj instanceof Company)) {
             return false;
+        }
         Company other = (Company) obj;
-        if (active != other.active)
+        if (active != other.active) {
             return false;
+        }
+        if (companyScore != other.companyScore) {
+            return false;
+        }
         if (description == null) {
-            if (other.description != null)
+            if (other.description != null) {
                 return false;
-        } else if (!description.equals(other.description))
+            }
+        } else if (!description.equals(other.description)) {
             return false;
-        if (id != other.id)
+        }
+        if (id != other.id) {
             return false;
-        if (industry == null) {
-            if (other.industry != null)
-                return false;
-        } else if (!industry.equals(other.industry))
-            return false;
+        }
         if (name == null) {
-            if (other.name != null)
+            if (other.name != null) {
                 return false;
-        } else if (!name.equals(other.name))
+            }
+        } else if (!name.equals(other.name)) {
             return false;
-        if (Double.doubleToLongBits(stockPrice) != Double.doubleToLongBits(other.stockPrice))
+        }
+        if (Double.doubleToLongBits(stockPrice) != Double.doubleToLongBits(other.stockPrice)) {
             return false;
+        }
+        if (tags == null) {
+            if (other.tags != null) {
+                return false;
+            }
+        } else if (!tags.equals(other.tags)) {
+            return false;
+        }
+        if (tweets == null) {
+            if (other.tweets != null) {
+                return false;
+            }
+        } else if (!tweets.equals(other.tweets)) {
+            return false;
+        }
         return true;
     }
+
+    /**
+     * Gets the stream tokens.
+     * 
+     * @return the stream tokens
+     */
+    public final List<String> getStreamTokens() {
+        List<String> list = new ArrayList<String>();
+        if (isActive()) {
+            list.add(getName());
+            for (String tag : getTags()) {
+                list.add(tag);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Calculate score.
+     * 
+     * @return the long
+     */
+    public final long calculateScore() {
+        long score = 0;
+        for (Tweet tweet : getTweets()) {
+            score += tweet.getTweetScore();
+        }
+        return score;
+    }
+
 }

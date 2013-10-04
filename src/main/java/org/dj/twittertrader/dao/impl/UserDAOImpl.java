@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -56,8 +57,9 @@ public class UserDAOImpl implements UserDAO {
                 user.setFavouritesCount(resultSet.getInt("favouritesCount"));
                 user.setVerified(resultSet.getBoolean("verified"));
                 user.setLang(resultSet.getString("lang"));
-                user.setCreatedAt(resultSet.getDate("createdAtUser"));
+                user.setCreatedAt(new Date(resultSet.getLong("createdAtUser")));
                 user.setLocation(resultSet.getString("locationUser"));
+                user.setUserScore(resultSet.getLong("scoreUser"));
                 user.setActive(resultSet.getBoolean("activeUser"));
                 list.add(user);
             }
@@ -94,11 +96,11 @@ public class UserDAOImpl implements UserDAO {
     public final void create(final User user) {
         String sql = "insert into User (idUser, nameUser,"
                 + " screenName, followersCount, friendsCount, favouritesCount,"
-                + " verified, lang, createdAtUser, locationUser, activeUser)"
-                + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                + " verified, lang, createdAtUser, locationUser,scoreUser, activeUser)"
+                + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?)"
                 + " on duplicate key update nameUser=?, screenName=?, followersCount=?,"
                 + " friendsCount=?, favouritesCount=?, verified=?, lang=?, createdAtUser=?,"
-                + " locationUser=?, activeUser=?";
+                + " locationUser=?, scoreUser=?, activeUser=?";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
@@ -111,19 +113,21 @@ public class UserDAOImpl implements UserDAO {
             statement.setLong(DBUtils.SIX, user.getFavouritesCount());
             statement.setBoolean(DBUtils.SEVEN, user.isVerified());
             statement.setString(DBUtils.EIGHT, user.getLang());
-            statement.setDate(DBUtils.NINE, DBUtils.convertDate(user.getCreatedAt()));
+            statement.setLong(DBUtils.NINE, user.getCreatedAt().getTime());
             statement.setString(DBUtils.TEN, user.getLocation());
-            statement.setBoolean(DBUtils.ELEVEN, user.isActive());
-            statement.setString(DBUtils.TWELVE, user.getName());
-            statement.setString(DBUtils.THIRTEEN, user.getScreenName());
-            statement.setLong(DBUtils.FOURTEEN, user.getFollowersCount());
-            statement.setLong(DBUtils.FITHTEEN, user.getFriendsCount());
-            statement.setLong(DBUtils.SIXTEEN, user.getFavouritesCount());
-            statement.setBoolean(DBUtils.SEVENTEEN, user.isVerified());
-            statement.setString(DBUtils.EIGHTEEN, user.getLang());
-            statement.setDate(DBUtils.NINETEEN, DBUtils.convertDate(user.getCreatedAt()));
-            statement.setString(DBUtils.TWENTY, user.getLocation());
-            statement.setBoolean(DBUtils.TWENTYONE, user.isActive());
+            statement.setLong(DBUtils.ELEVEN, user.getUserScore());
+            statement.setBoolean(DBUtils.TWELVE, user.isActive());
+            statement.setString(DBUtils.THIRTEEN, user.getName());
+            statement.setString(DBUtils.FOURTEEN, user.getScreenName());
+            statement.setLong(DBUtils.FITHTEEN, user.getFollowersCount());
+            statement.setLong(DBUtils.SIXTEEN, user.getFriendsCount());
+            statement.setLong(DBUtils.SEVENTEEN, user.getFavouritesCount());
+            statement.setBoolean(DBUtils.EIGHTEEN, user.isVerified());
+            statement.setString(DBUtils.NINETEEN, user.getLang());
+            statement.setLong(DBUtils.TWENTY, user.getCreatedAt().getTime());
+            statement.setString(DBUtils.TWENTYONE, user.getLocation());
+            statement.setLong(DBUtils.TWENTYTWO, user.getUserScore());
+            statement.setBoolean(DBUtils.TWENTYTHREE, user.isActive());
             statement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());
@@ -139,7 +143,7 @@ public class UserDAOImpl implements UserDAO {
     public final void update(final User user) {
         String sql = "update User set nameUser=?,"
                 + " screenName=?, followersCount=?, friendsCount=?, favouritesCount=?,"
-                + " verified=?, lang=?, createdAtUser=?, locationUser=?, activeUser=?"
+                + " verified=?, lang=?, createdAtUser=?, locationUser=?, scoreUser=?, activeUser=?"
                 + " where idUser=?";
         LOGGER.info(sql);
         try {
@@ -152,10 +156,11 @@ public class UserDAOImpl implements UserDAO {
             statement.setLong(DBUtils.FIVE, user.getFavouritesCount());
             statement.setBoolean(DBUtils.SIX, user.isVerified());
             statement.setString(DBUtils.SEVEN, user.getLang());
-            statement.setDate(DBUtils.EIGHT, DBUtils.convertDate(user.getCreatedAt()));
+            statement.setLong(DBUtils.EIGHT, user.getCreatedAt().getTime());
             statement.setString(DBUtils.NINE, user.getLocation());
-            statement.setBoolean(DBUtils.TEN, user.isActive());
-            statement.setLong(DBUtils.ELEVEN, user.getId());
+            statement.setLong(DBUtils.TEN, user.getUserScore());
+            statement.setBoolean(DBUtils.ELEVEN, user.isActive());
+            statement.setLong(DBUtils.TWELVE, user.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());
@@ -187,8 +192,9 @@ public class UserDAOImpl implements UserDAO {
                 user.setFavouritesCount(resultSet.getInt("favouritesCount"));
                 user.setVerified(resultSet.getBoolean("verified"));
                 user.setLang(resultSet.getString("lang"));
-                user.setCreatedAt(resultSet.getDate("createdAtUser"));
+                user.setCreatedAt(new Date(resultSet.getLong("createdAtUser")));
                 user.setLocation(resultSet.getString("locationUser"));
+                user.setUserScore(resultSet.getLong("scoreUser"));
                 user.setActive(resultSet.getBoolean("activeUser"));
             }
         } catch (SQLException e) {

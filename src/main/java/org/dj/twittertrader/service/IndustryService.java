@@ -2,6 +2,7 @@ package org.dj.twittertrader.service;
 
 import java.util.List;
 
+import org.dj.twittertrader.dao.IndustryDAO;
 import org.dj.twittertrader.model.Industry;
 
 /**
@@ -41,6 +42,20 @@ public interface IndustryService {
      */
     void update(Industry industry);
 
+    /**
+     * Creates the.
+     * 
+     * @param industry
+     *            the industry
+     */
     void create(Industry industry);
+
+    /**
+     * Sets the industry dao.
+     * 
+     * @param industryDAO
+     *            the new industry dao
+     */
+    void setIndustryDAO(IndustryDAO industryDAO);
 
 }

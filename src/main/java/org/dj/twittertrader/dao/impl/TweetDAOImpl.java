@@ -6,13 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.dj.twittertrader.dao.TweetDAO;
-import org.dj.twittertrader.model.Company;
-import org.dj.twittertrader.model.Industry;
 import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.model.User;
 import org.dj.twittertrader.utils.DBUtils;
@@ -45,11 +44,7 @@ public class TweetDAOImpl implements TweetDAO {
         List<Tweet> list = new ArrayList<Tweet>();
         Tweet tweet;
         User user;
-        Company company;
-        Industry industry;
-        String sql = "SELECT * FROM Tweet " + "inner join User on Tweet.user=User.idUser"
-                + " inner join Company on Tweet.company=Company.idCompany "
-                + "inner join Industry on Company.industry=Industry.idIndustry"
+        String sql = "SELECT * FROM Tweet inner join User on Tweet.user=User.idUser"
                 + " where Tweet.activeTweet=1";
         LOGGER.info(sql);
         try {
@@ -59,12 +54,11 @@ public class TweetDAOImpl implements TweetDAO {
             while (resultSet.next()) {
                 tweet = new Tweet();
                 user = new User();
-                company = new Company();
-                industry = new Industry();
                 tweet.setId(resultSet.getLong("idTweet"));
-                tweet.setCreatedAt(resultSet.getDate("createdAtTweet"));
+                tweet.setCreatedAt(new Date(resultSet.getLong("createdAtTweet")));
                 tweet.setText(resultSet.getString("text"));
                 tweet.setRetweetCount(resultSet.getLong("retweetCount"));
+                tweet.setTweetScore(resultSet.getLong("scoreTweet"));
                 tweet.setActive(resultSet.getBoolean("activeTweet"));
                 user.setId(resultSet.getLong("idUser"));
                 user.setName(resultSet.getString("nameUser"));
@@ -74,21 +68,11 @@ public class TweetDAOImpl implements TweetDAO {
                 user.setFavouritesCount(resultSet.getInt("favouritesCount"));
                 user.setVerified(resultSet.getBoolean("verified"));
                 user.setLang(resultSet.getString("lang"));
-                user.setCreatedAt(resultSet.getDate("createdAtUser"));
+                user.setCreatedAt(new Date(resultSet.getLong("createdAtUser")));
                 user.setLocation(resultSet.getString("locationUser"));
+                user.setUserScore(resultSet.getLong("scoreUser"));
                 user.setActive(resultSet.getBoolean("activeUser"));
                 tweet.setUser(user);
-                company.setId(resultSet.getLong("idCompany"));
-                company.setName(resultSet.getString("nameCompany"));
-                company.setStockPrice(resultSet.getDouble("stockPrice"));
-                company.setDescription(resultSet.getString("descriptionCompany"));
-                company.setActive(resultSet.getBoolean("activeCompany"));
-                industry.setId(resultSet.getLong("industry"));
-                industry.setName(resultSet.getString("nameIndustry"));
-                industry.setDescription(resultSet.getString("descriptionIndustry"));
-                industry.setActive(resultSet.getBoolean("activeIndustry"));
-                company.setIndustry(industry);
-                tweet.setCompany(company);
                 list.add(tweet);
             }
         } catch (SQLException e) {
@@ -122,26 +106,35 @@ public class TweetDAOImpl implements TweetDAO {
     @Override
     public final void create(final Tweet tweet) {
         String sql = "insert into Tweet (idTweet, createdAtTweet,"
-                + " text, retweetCount, user, company, activeTweet) values (?, ?, ?, ?, ?, ?, ?)";
+                + " text, user, retweetCount, scoreTweet, activeTweet)"
+                + " values (?, ?, ?, ?, ?, ?, ?)"
+                + " on duplicate key update createdAtTweet=?, text=?, user=?,"
+                + " retweetCount=?, scoreTweet=?, activeTweet=?";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(sql);
             statement.setLong(DBUtils.ONE, tweet.getId());
-            statement.setDate(DBUtils.TWO, DBUtils.convertDate(tweet.getCreatedAt()));
+            statement.setLong(DBUtils.TWO, tweet.getCreatedAt().getTime());
             statement.setString(DBUtils.THREE, tweet.getText());
-            statement.setLong(DBUtils.FOUR, tweet.getRetweetCount());
             if (tweet.getUser() != null) {
-                statement.setLong(DBUtils.FIVE, tweet.getUser().getId());
+                statement.setLong(DBUtils.FOUR, tweet.getUser().getId());
             } else {
-                statement.setNull(DBUtils.FIVE, Types.BIGINT);
+                statement.setNull(DBUtils.FOUR, Types.BIGINT);
             }
-            if (tweet.getCompany() != null) {
-                statement.setLong(DBUtils.SIX, tweet.getCompany().getId());
-            } else {
-                statement.setNull(DBUtils.SIX, Types.BIGINT);
-            }
+            statement.setLong(DBUtils.FIVE, tweet.getRetweetCount());
+            statement.setLong(DBUtils.SIX, tweet.getTweetScore());
             statement.setBoolean(DBUtils.SEVEN, tweet.isActive());
+            statement.setLong(DBUtils.EIGHT, tweet.getCreatedAt().getTime());
+            statement.setString(DBUtils.NINE, tweet.getText());
+            if (tweet.getUser() != null) {
+                statement.setLong(DBUtils.TEN, tweet.getUser().getId());
+            } else {
+                statement.setNull(DBUtils.TEN, Types.BIGINT);
+            }
+            statement.setLong(DBUtils.ELEVEN, tweet.getRetweetCount());
+            statement.setLong(DBUtils.TWELVE, tweet.getTweetScore());
+            statement.setBoolean(DBUtils.THIRTEEN, tweet.isActive());
             statement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());
@@ -156,16 +149,15 @@ public class TweetDAOImpl implements TweetDAO {
     @Override
     public final void update(final Tweet tweet) {
         String sql = "update Tweet set createdAtTweet=?,"
-                + " text=?, retweetCount=?, user=?, company=?, activeTweet=? where idTweet=?";
+                + " text=?, user=?, retweetCount=?, scoreTweet=?, activeTweet=? where idTweet=?";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(sql);
-            statement.setDate(DBUtils.ONE, DBUtils.convertDate(tweet.getCreatedAt()));
+            statement.setLong(DBUtils.ONE, tweet.getCreatedAt().getTime());
             statement.setString(DBUtils.TWO, tweet.getText());
             statement.setLong(DBUtils.THREE, tweet.getRetweetCount());
-            statement.setLong(DBUtils.FOUR, tweet.getUser().getId());
-            statement.setLong(DBUtils.FIVE, tweet.getCompany().getId());
+            statement.setLong(DBUtils.FOUR, tweet.getTweetScore());
             statement.setBoolean(DBUtils.SIX, tweet.isActive());
             statement.setLong(DBUtils.SEVEN, tweet.getId());
             statement.executeUpdate();
@@ -183,11 +175,7 @@ public class TweetDAOImpl implements TweetDAO {
     public final Tweet select(final long id) {
         Tweet tweet = null;
         User user;
-        Company company;
-        Industry industry;
-        String sql = "SELECT * FROM Tweet " + "inner join User on Tweet.user=User.idUser"
-                + " inner join Company on Tweet.company=Company.idCompany"
-                + " inner join Industry on Company.industry=Industry.idIndustry"
+        String sql = "SELECT * FROM Tweet inner join User on Tweet.user=User.idUser"
                 + " where idTweet=? AND activeTweet=1";
         LOGGER.info(sql);
         try {
@@ -198,12 +186,11 @@ public class TweetDAOImpl implements TweetDAO {
             while (resultSet.next()) {
                 tweet = new Tweet();
                 user = new User();
-                company = new Company();
-                industry = new Industry();
                 tweet.setId(resultSet.getLong("idTweet"));
-                tweet.setCreatedAt(resultSet.getDate("createdAtTweet"));
+                tweet.setCreatedAt(new Date(resultSet.getLong("createdAtTweet")));
                 tweet.setText(resultSet.getString("text"));
                 tweet.setRetweetCount(resultSet.getLong("retweetCount"));
+                tweet.setTweetScore(resultSet.getLong("scoreTweet"));
                 tweet.setActive(resultSet.getBoolean("activeTweet"));
                 user.setId(resultSet.getLong("idUser"));
                 user.setName(resultSet.getString("nameUser"));
@@ -213,21 +200,11 @@ public class TweetDAOImpl implements TweetDAO {
                 user.setFavouritesCount(resultSet.getInt("favouritesCount"));
                 user.setVerified(resultSet.getBoolean("verified"));
                 user.setLang(resultSet.getString("lang"));
-                user.setCreatedAt(resultSet.getDate("createdAtUser"));
+                user.setCreatedAt(new Date(resultSet.getLong("createdAtUser")));
                 user.setLocation(resultSet.getString("locationUser"));
+                user.setUserScore(resultSet.getLong("scoreUser"));
                 user.setActive(resultSet.getBoolean("activeUser"));
                 tweet.setUser(user);
-                company.setId(resultSet.getLong("idCompany"));
-                company.setName(resultSet.getString("nameCompany"));
-                company.setStockPrice(resultSet.getDouble("stockPrice"));
-                company.setDescription(resultSet.getString("descriptionCompany"));
-                company.setActive(resultSet.getBoolean("activeCompany"));
-                industry.setId(resultSet.getLong("industry"));
-                industry.setName(resultSet.getString("nameIndustry"));
-                industry.setDescription(resultSet.getString("descriptionIndustry"));
-                industry.setActive(resultSet.getBoolean("activeIndustry"));
-                company.setIndustry(industry);
-                tweet.setCompany(company);
             }
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());

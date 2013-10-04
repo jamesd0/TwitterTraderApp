@@ -1,9 +1,10 @@
 package org.dj.twittertrader.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.Gson;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * The Class Portfolio.
@@ -39,9 +40,10 @@ public class Portfolio {
     public final List<String> getAllStreamTokens() {
         List<String> list = new ArrayList<String>();
         for (Company company : companies) {
-            if (company.isActive()) {
-                list.add(company.getName());
-            }
+            list.addAll(company.getStreamTokens());
+        }
+        for (Industry industry : industries) {
+            list.addAll(industry.getStreamTokens());
         }
         return list;
     }
@@ -185,9 +187,11 @@ public class Portfolio {
      * @param json
      *            the json
      * @return the portfolio
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    public static Portfolio fromJson(final String json) {
-        return new Gson().fromJson(json, Portfolio.class);
+    public static Portfolio fromJson(final String json) throws IOException {
+        return new ObjectMapper().readValue(json, Portfolio.class);
     }
 
     /**
@@ -196,9 +200,91 @@ public class Portfolio {
      * @param portfolio
      *            the portfolio
      * @return the string
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    public static String toJson(final Portfolio portfolio) {
-        return new Gson().toJson(portfolio);
+    public static String toJson(final Portfolio portfolio) throws IOException {
+        return new ObjectMapper().writeValueAsString(portfolio);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (active ? 1231 : 1237);
+        result = prime * result + ((companies == null) ? 0 : companies.hashCode());
+        result = prime * result + (int) (id ^ (id >>> 32));
+        result = prime * result + ((industries == null) ? 0 : industries.hashCode());
+        result = prime * result + ((owner == null) ? 0 : owner.hashCode());
+        result = prime * result + ((password == null) ? 0 : password.hashCode());
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Portfolio)) {
+            return false;
+        }
+        Portfolio other = (Portfolio) obj;
+        if (active != other.active) {
+            return false;
+        }
+        if (companies == null) {
+            if (other.companies != null) {
+                return false;
+            }
+        } else if (!companies.equals(other.companies)) {
+            return false;
+        }
+        if (id != other.id) {
+            return false;
+        }
+        if (industries == null) {
+            if (other.industries != null) {
+                return false;
+            }
+        } else if (!industries.equals(other.industries)) {
+            return false;
+        }
+        if (owner == null) {
+            if (other.owner != null) {
+                return false;
+            }
+        } else if (!owner.equals(other.owner)) {
+            return false;
+        }
+        if (password == null) {
+            if (other.password != null) {
+                return false;
+            }
+        } else if (!password.equals(other.password)) {
+            return false;
+        }
+        if (username == null) {
+            if (other.username != null) {
+                return false;
+            }
+        } else if (!username.equals(other.username)) {
+            return false;
+        }
+        return true;
     }
 
 }

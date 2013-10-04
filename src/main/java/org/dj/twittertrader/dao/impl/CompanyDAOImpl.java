@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package org.dj.twittertrader.dao.impl;
 
 import java.sql.Connection;
@@ -11,7 +14,8 @@ import javax.sql.DataSource;
 
 import org.dj.twittertrader.dao.CompanyDAO;
 import org.dj.twittertrader.model.Company;
-import org.dj.twittertrader.model.Industry;
+import org.dj.twittertrader.model.Tweet;
+import org.dj.twittertrader.service.TweetService;
 import org.dj.twittertrader.utils.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +32,9 @@ public class CompanyDAOImpl implements CompanyDAO {
     /** The Constant logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(CompanyDAOImpl.class);
 
+    /** The tweet service. */
+    @Autowired
+    private TweetService tweetService;
     /** The data source. */
     @Autowired
     private DataSource dataSource;
@@ -75,8 +82,8 @@ public class CompanyDAOImpl implements CompanyDAO {
      */
     @Override
     public final void update(final Company company) {
-        String sql = "update Company set nameCompany=?," + " descriptionCompany=?, stockPrice=?,"
-                + " industry=?, activeCompany=? where idCompany=?";
+        String sql = "update Company set nameCompany=?, descriptionCompany=?, stockPrice=?,"
+                + " scoreCompany=?, activeCompany=? where idCompany=?";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
@@ -84,7 +91,7 @@ public class CompanyDAOImpl implements CompanyDAO {
             statement.setString(DBUtils.ONE, company.getName());
             statement.setString(DBUtils.TWO, company.getDescription());
             statement.setDouble(DBUtils.THREE, company.getStockPrice());
-            statement.setLong(DBUtils.FOUR, company.getIndustry().getId());
+            statement.setLong(DBUtils.FOUR, company.getCompanyScore());
             statement.setBoolean(DBUtils.FIVE, company.isActive());
             statement.setLong(DBUtils.SIX, company.getId());
             statement.executeUpdate();
@@ -107,7 +114,7 @@ public class CompanyDAOImpl implements CompanyDAO {
     @Override
     public final void create(final Company company) {
         String sql = "insert into Company (nameCompany,"
-                + " descriptionCompany, stockPrice, industry,"
+                + " descriptionCompany, stockPrice, scoreCompany,"
                 + " activeCompany) values (?, ?, ?, ?, ?)";
         LOGGER.info(sql);
         try {
@@ -116,7 +123,7 @@ public class CompanyDAOImpl implements CompanyDAO {
             statement.setString(DBUtils.ONE, company.getName());
             statement.setString(DBUtils.TWO, company.getDescription());
             statement.setDouble(DBUtils.THREE, company.getStockPrice());
-            statement.setLong(DBUtils.FOUR, company.getIndustry().getId());
+            statement.setLong(DBUtils.FOUR, company.getCompanyScore());
             statement.setBoolean(DBUtils.FIVE, company.isActive());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -137,31 +144,120 @@ public class CompanyDAOImpl implements CompanyDAO {
     @Override
     public final List<Company> selectAll() {
         List<Company> list = new ArrayList<Company>();
-        Company company;
-        Industry industry;
-        String sql = "SELECT Company.*, Industry.nameIndustry,"
-                + " Industry.descriptionIndustry, Industry.activeIndustry "
-                + "FROM twittertrader.Company " + "inner join Industry on"
-                + " Company.industry=Industry.idIndustry where Company.activeCompany=1;";
+        String sql = "SELECT * FROM Company where Company.activeCompany=1;";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(sql);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                industry = new Industry();
+                Company company = new Company();
+                company.setId(resultSet.getLong("idCompany"));
+                company.setName(resultSet.getString("nameCompany"));
+                company.setStockPrice(resultSet.getDouble("stockPrice"));
+                company.setDescription(resultSet.getString("descriptionCompany"));
+                company.setCompanyScore(resultSet.getLong("scoreCompany"));
+                company.setActive(resultSet.getBoolean("activeCompany"));
+                list.add(company);
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e.getMessage());
+        } finally {
+            DBUtils.close(resultSet);
+            DBUtils.close(statement);
+            DBUtils.close(connection);
+        }
+        for (Company company : list) {
+            company.setTags(getAllCompanyTags(company.getId()));
+            company.setTweets(getAllCompanyTweets(company.getId()));
+        }
+        return list;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.dj.twittertrader.dao.CompanyDAO#select(long)
+     */
+    @Override
+    public final Company select(final long id) {
+        Company company = null;
+        String sql = "SELECT * FROM Company where Company.activeCompany=1 and Company.idCompany=?";
+        LOGGER.info(sql);
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setLong(DBUtils.ONE, id);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
                 company = new Company();
                 company.setId(resultSet.getLong("idCompany"));
                 company.setName(resultSet.getString("nameCompany"));
                 company.setStockPrice(resultSet.getDouble("stockPrice"));
                 company.setDescription(resultSet.getString("descriptionCompany"));
+                company.setCompanyScore(resultSet.getLong("scoreCompany"));
                 company.setActive(resultSet.getBoolean("activeCompany"));
-                industry.setId(resultSet.getLong("industry"));
-                industry.setName(resultSet.getString("nameIndustry"));
-                industry.setDescription(resultSet.getString("descriptionIndustry"));
-                industry.setActive(resultSet.getBoolean("activeIndustry"));
-                company.setIndustry(industry);
-                list.add(company);
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e.getMessage());
+        } finally {
+            DBUtils.close(resultSet);
+            DBUtils.close(statement);
+            DBUtils.close(connection);
+        }
+        if (company != null) {
+            company.setTags(getAllCompanyTags(company.getId()));
+            company.setTweets(getAllCompanyTweets(company.getId()));
+        }
+        return company;
+    }
+
+    /**
+     * Gets the all company tags.
+     * 
+     * @param id
+     *            the id
+     * @return the all company tags
+     */
+    private List<String> getAllCompanyTags(final long id) {
+        List<String> tags = new ArrayList<String>();
+        String sql = "SELECT tag from company_tags where company=?";
+        LOGGER.info(sql);
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setLong(DBUtils.ONE, id);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                tags.add(resultSet.getString("tag"));
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e.getMessage());
+        } finally {
+            DBUtils.close(resultSet);
+            DBUtils.close(statement);
+            DBUtils.close(connection);
+        }
+        return tags;
+    }
+
+    /**
+     * Gets the all company tweets.
+     * 
+     * @param id
+     *            the id
+     * @return the all company tweets
+     */
+    private List<Tweet> getAllCompanyTweets(final long id) {
+        List<Tweet> list = new ArrayList<Tweet>();
+        String sql = "select tweetCT from company_tweet where company_tweet.companyCT=?";
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setLong(DBUtils.ONE, id);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                list.add(tweetService.select(resultSet.getLong("tweetCT")));
             }
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());
@@ -176,36 +272,20 @@ public class CompanyDAOImpl implements CompanyDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dj.twittertrader.dao.CompanyDAO#select(long)
+     * @see
+     * org.dj.twittertrader.dao.CompanyDAO#addTweetToCompany(org.dj.twittertrader
+     * .model.Company, org.dj.twittertrader.model.Tweet)
      */
     @Override
-    public final Company select(final long id) {
-        Company company = null;
-        Industry industry;
-        String sql = "SELECT Company.*, Industry.nameIndustry,"
-                + " Industry.descriptionIndustry, Industry.activeIndustry"
-                + " FROM twittertrader.Company inner join Industry on"
-                + " Company.industry=Industry.idIndustry" + " where Company.idCompany=" + id
-                + " AND activeCompany=1";
+    public final void addTweetToCompany(final Company company, final Tweet tweet) {
+        String sql = "INSERT INTO company_tweet (companyCT, tweetCT) VALUES (?, ?)";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(sql);
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                industry = new Industry();
-                company = new Company();
-                company.setId(resultSet.getLong("idCompany"));
-                company.setName(resultSet.getString("nameCompany"));
-                company.setStockPrice(resultSet.getDouble("stockPrice"));
-                company.setDescription(resultSet.getString("descriptionCompany"));
-                company.setActive(resultSet.getBoolean("activeCompany"));
-                industry.setId(resultSet.getLong("industry"));
-                industry.setName(resultSet.getString("nameIndustry"));
-                industry.setDescription(resultSet.getString("descriptionIndustry"));
-                industry.setActive(resultSet.getBoolean("activeIndustry"));
-                company.setIndustry(industry);
-            }
+            statement.setLong(DBUtils.ONE, company.getId());
+            statement.setLong(DBUtils.TWO, tweet.getId());
+            statement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());
         } finally {
@@ -213,6 +293,18 @@ public class CompanyDAOImpl implements CompanyDAO {
             DBUtils.close(statement);
             DBUtils.close(connection);
         }
-        return company;
+
+    }
+
+    @Override
+    public final void setDataSource(final DataSource dataSource) {
+        this.dataSource = dataSource;
+
+    }
+
+    @Override
+    public final void setTweetService(final TweetService tweetService) {
+        this.tweetService = tweetService;
+
     }
 }

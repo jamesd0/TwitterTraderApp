@@ -18,8 +18,7 @@ import com.rabbitmq.client.ConnectionFactory;
 public class RabbitMQBroker implements MessagingBroker {
 
     /** The Constant logger. */
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(RabbitMQBroker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQBroker.class);
 
     /** The Constant QUEUE_NAME. */
     private static final String QUEUE_NAME = "twitter.trader";
@@ -45,8 +44,8 @@ public class RabbitMQBroker implements MessagingBroker {
             this.init();
         }
         try {
-            LOGGER.info("Uploaded message: " + new String(message, "UTF-8")
-                    + " to queue: " + QUEUE_NAME);
+            LOGGER.info("Uploaded message: " + new String(message, "UTF-8") + " to queue: "
+                    + QUEUE_NAME);
             channel.basicPublish("", QUEUE_NAME, null, message);
         } catch (IOException e) {
             LOGGER.debug(e.getMessage());
@@ -67,4 +66,43 @@ public class RabbitMQBroker implements MessagingBroker {
 
     }
 
+    /**
+     * Sets the factory.
+     * 
+     * @param factory2
+     *            the new factory
+     */
+    public final void setFactory(final ConnectionFactory factory2) {
+        this.factory = factory2;
+    }
+
+    /**
+     * Checks if is initialised.
+     * 
+     * @return true, if is initialised
+     */
+    public final boolean isInitialised() {
+        return initialised;
+    }
+
+    /**
+     * Sets the initialised.
+     * 
+     * @param initialised
+     *            the new initialised
+     */
+    public final void setInitialised(final boolean initialised) {
+        this.initialised = initialised;
+    }
+
+    /**
+     * Sets the channel.
+     * 
+     * @param channel2
+     *            the new channel
+     */
+    public final void setChannel(final Channel channel2) {
+        this.channel = channel2;
+
+    }
 }

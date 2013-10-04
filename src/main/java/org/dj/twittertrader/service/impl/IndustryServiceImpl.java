@@ -83,7 +83,7 @@ public class IndustryServiceImpl implements IndustryService {
 
     @Override
     @Transactional
-    public void create(Industry industry) {
+    public final void create(final Industry industry) {
         industryDAO.create(industry);
 
     }

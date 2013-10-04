@@ -2,6 +2,7 @@ package org.dj.twittertrader.service;
 
 import java.util.List;
 
+import org.dj.twittertrader.dao.PortfolioDAO;
 import org.dj.twittertrader.model.Portfolio;
 
 /**
@@ -59,5 +60,13 @@ public interface PortfolioService {
      * @return the portfolio
      */
     Portfolio login(String username, String password);
+
+    /**
+     * Sets the portfolio dao.
+     * 
+     * @param portfolioDAO
+     *            the new portfolio dao
+     */
+    void setPortfolioDAO(PortfolioDAO portfolioDAO);
 
 }

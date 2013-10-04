@@ -2,7 +2,11 @@ package org.dj.twittertrader.dao;
 
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.dj.twittertrader.model.Company;
+import org.dj.twittertrader.model.Tweet;
+import org.dj.twittertrader.service.TweetService;
 
 /**
  * This interface is the DAO for the Company entity. It provides an abstraction
@@ -50,5 +54,31 @@ public interface CompanyDAO {
      *            the company
      */
     void delete(Company company);
+
+    /**
+     * Adds the tweet to company.
+     * 
+     * @param company
+     *            the company
+     * @param tweet
+     *            the tweet
+     */
+    void addTweetToCompany(Company company, Tweet tweet);
+
+    /**
+     * Sets the data source.
+     * 
+     * @param dataSource
+     *            the new data source
+     */
+    void setDataSource(DataSource dataSource);
+
+    /**
+     * Sets the tweet service.
+     * 
+     * @param tweetService
+     *            the new tweet service
+     */
+    void setTweetService(TweetService tweetService);
 
 }

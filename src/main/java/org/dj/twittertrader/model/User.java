@@ -1,8 +1,9 @@
 package org.dj.twittertrader.model;
 
+import java.io.IOException;
 import java.util.Date;
 
-import com.google.gson.Gson;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * The Class User.
@@ -39,6 +40,9 @@ public class User {
     /** The location. */
     private String location;
 
+    /** The user score. */
+    private long userScore;
+
     /** The active. */
     private boolean active;
 
@@ -59,6 +63,7 @@ public class User {
         lang = user.getLang();
         createdAt = user.getCreatedAt();
         location = user.getLocation();
+        userScore = calculateUserScore();
         active = true;
     }
 
@@ -67,6 +72,15 @@ public class User {
      */
     public User() {
         super();
+    }
+
+    /**
+     * Calculate user score. Based on the users twitter stats
+     * 
+     * @return the int
+     */
+    private long calculateUserScore() {
+        return followersCount * friendsCount * favouritesCount * (verified ? 10 : 1);
     }
 
     /**
@@ -260,6 +274,25 @@ public class User {
     }
 
     /**
+     * Gets the user score.
+     * 
+     * @return the user score
+     */
+    public final long getUserScore() {
+        return userScore;
+    }
+
+    /**
+     * Sets the user score.
+     * 
+     * @param userScore
+     *            the new user score
+     */
+    public final void setUserScore(final long userScore) {
+        this.userScore = userScore;
+    }
+
+    /**
      * Checks if is active.
      * 
      * @return true, if is active
@@ -284,9 +317,11 @@ public class User {
      * @param json
      *            the json
      * @return the user
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    public static User fromJson(final String json) {
-        return new Gson().fromJson(json, User.class);
+    public static User fromJson(final String json) throws IOException {
+        return new ObjectMapper().readValue(json, User.class);
     }
 
     /**
@@ -295,9 +330,111 @@ public class User {
      * @param user
      *            the user
      * @return the string
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    public static String toJson(final User user) {
-        return new Gson().toJson(user);
+    public static String toJson(final User user) throws IOException {
+        return new ObjectMapper().writeValueAsString(user);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (active ? 1231 : 1237);
+        result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
+        result = prime * result + favouritesCount;
+        result = prime * result + followersCount;
+        result = prime * result + friendsCount;
+        result = prime * result + (int) (id ^ (id >>> 32));
+        result = prime * result + ((lang == null) ? 0 : lang.hashCode());
+        result = prime * result + ((location == null) ? 0 : location.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((screenName == null) ? 0 : screenName.hashCode());
+        result = (int) (prime * result + userScore);
+        result = prime * result + (verified ? 1231 : 1237);
+        return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof User)) {
+            return false;
+        }
+        User other = (User) obj;
+        if (active != other.active) {
+            return false;
+        }
+        if (createdAt == null) {
+            if (other.createdAt != null) {
+                return false;
+            }
+        } else if (!createdAt.equals(other.createdAt)) {
+            return false;
+        }
+        if (favouritesCount != other.favouritesCount) {
+            return false;
+        }
+        if (followersCount != other.followersCount) {
+            return false;
+        }
+        if (friendsCount != other.friendsCount) {
+            return false;
+        }
+        if (id != other.id) {
+            return false;
+        }
+        if (lang == null) {
+            if (other.lang != null) {
+                return false;
+            }
+        } else if (!lang.equals(other.lang)) {
+            return false;
+        }
+        if (location == null) {
+            if (other.location != null) {
+                return false;
+            }
+        } else if (!location.equals(other.location)) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (screenName == null) {
+            if (other.screenName != null) {
+                return false;
+            }
+        } else if (!screenName.equals(other.screenName)) {
+            return false;
+        }
+        if (userScore != other.userScore) {
+            return false;
+        }
+        if (verified != other.verified) {
+            return false;
+        }
+        return true;
     }
 
 }

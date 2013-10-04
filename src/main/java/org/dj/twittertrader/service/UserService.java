@@ -2,6 +2,7 @@ package org.dj.twittertrader.service;
 
 import java.util.List;
 
+import org.dj.twittertrader.dao.UserDAO;
 import org.dj.twittertrader.model.User;
 
 /**
@@ -48,5 +49,13 @@ public interface UserService {
      * @return the user
      */
     User select(long id);
+
+    /**
+     * Sets the user dao.
+     * 
+     * @param userDAO
+     *            the new user dao
+     */
+    void setUserDAO(UserDAO userDAO);
 
 }

@@ -2,6 +2,7 @@ package org.dj.twittertrader.service;
 
 import java.util.List;
 
+import org.dj.twittertrader.dao.TweetDAO;
 import org.dj.twittertrader.model.Tweet;
 
 /**
@@ -48,5 +49,13 @@ public interface TweetService {
      * @return the tweet
      */
     Tweet select(long id);
+
+    /**
+     * Sets the tweet dao.
+     * 
+     * @param tweetDAO
+     *            the new tweet dao
+     */
+    void setTweetDAO(TweetDAO tweetDAO);
 
 }

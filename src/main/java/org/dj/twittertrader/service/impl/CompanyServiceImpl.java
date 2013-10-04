@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.dj.twittertrader.dao.CompanyDAO;
 import org.dj.twittertrader.model.Company;
+import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,7 +96,15 @@ public class CompanyServiceImpl implements CompanyService {
      * @param sourceDAO
      *            the companyDAO to set
      */
+    @Override
     public final void setCompanyDAO(final CompanyDAO sourceDAO) {
         this.companyDAO = sourceDAO;
+    }
+
+    @Override
+    @Transactional
+    public final void addTweetToCompany(final Company company, final Tweet tweet) {
+        companyDAO.addTweetToCompany(company, tweet);
+
     }
 }
