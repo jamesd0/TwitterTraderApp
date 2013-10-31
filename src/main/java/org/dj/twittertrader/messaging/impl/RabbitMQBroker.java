@@ -23,6 +23,12 @@ public class RabbitMQBroker implements MessagingBroker {
     /** The Constant QUEUE_NAME. */
     private static final String QUEUE_NAME = "twitter.trader";
 
+    /** The Constant EXCHANGE_NAME. */
+    private static final String EXCHANGE_NAME = "twittertrader-exchange";
+
+    /** The Constant ROUTING_KEY. */
+    private static final String ROUTING_KEY = "routingKey";
+
     /** The factory. */
     @Autowired
     private ConnectionFactory factory;
@@ -46,7 +52,7 @@ public class RabbitMQBroker implements MessagingBroker {
         try {
             LOGGER.info("Uploaded message: " + new String(message, "UTF-8") + " to queue: "
                     + QUEUE_NAME);
-            channel.basicPublish("", QUEUE_NAME, null, message);
+            channel.basicPublish(EXCHANGE_NAME, ROUTING_KEY, null, message);
         } catch (IOException e) {
             LOGGER.debug(e.getMessage());
         }

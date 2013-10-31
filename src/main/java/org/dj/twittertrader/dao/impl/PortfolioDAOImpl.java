@@ -28,7 +28,7 @@ import org.springframework.stereotype.Repository;
 public class PortfolioDAOImpl implements PortfolioDAO {
 
     /** The Constant logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(TweetDAOImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PortfolioDAOImpl.class);
     /** The data source. */
     @Autowired
     private DataSource dataSource;
@@ -52,7 +52,6 @@ public class PortfolioDAOImpl implements PortfolioDAO {
     @Override
     public final List<Portfolio> selectAll() {
         List<Portfolio> list = new ArrayList<Portfolio>();
-        Portfolio portfolio = null;
         String sql = "SELECT * FROM Portfolio where activePortfolio=1";
         LOGGER.info(sql);
         try {
@@ -60,7 +59,7 @@ public class PortfolioDAOImpl implements PortfolioDAO {
             statement = connection.prepareStatement(sql);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                portfolio = new Portfolio();
+                Portfolio portfolio = new Portfolio();
                 portfolio.setId(resultSet.getLong("idPortfolio"));
                 portfolio.setOwner(resultSet.getString("owner"));
                 portfolio.setUsername(resultSet.getString("usernamePortfolio"));
@@ -77,9 +76,9 @@ public class PortfolioDAOImpl implements PortfolioDAO {
             DBUtils.close(statement);
             DBUtils.close(connection);
         }
-        for (Portfolio p : list) {
-            populatePortfolioCompanies(p);
-            populatePortfolioIndustries(p);
+        for (Portfolio portfolio : list) {
+            companyService.populatePortfolioCompanies(portfolio);
+            industryService.populatePortfolioIndustries(portfolio);
         }
         return list;
     }
@@ -178,63 +177,9 @@ public class PortfolioDAOImpl implements PortfolioDAO {
             DBUtils.close(statement);
             DBUtils.close(connection);
         }
-        populatePortfolioCompanies(portfolio);
-        populatePortfolioIndustries(portfolio);
+        companyService.populatePortfolioCompanies(portfolio);
+        industryService.populatePortfolioIndustries(portfolio);
         return portfolio;
-    }
-
-    /**
-     * Populate portfolio industries.
-     * 
-     * @param portfolio
-     *            the portfolio
-     */
-    private void populatePortfolioIndustries(final Portfolio portfolio) {
-        String sql = "select industryPI from portfolio_industry where portfolioPI=?";
-        LOGGER.info(sql);
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.prepareStatement(sql);
-            statement.setLong(DBUtils.ONE, portfolio.getId());
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                portfolio.getIndustries().add(
-                        industryService.select(resultSet.getLong("industryPI")));
-            }
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
-        } finally {
-            DBUtils.close(resultSet);
-            DBUtils.close(statement);
-            DBUtils.close(connection);
-        }
-    }
-
-    /**
-     * Populate portfolio companies.
-     * 
-     * @param portfolio
-     *            the portfolio
-     */
-    private void populatePortfolioCompanies(final Portfolio portfolio) {
-        String sql = "select companyPK from portfolio_company where portfolioPC=?";
-        LOGGER.info(sql);
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.prepareStatement(sql);
-            statement.setLong(DBUtils.ONE, portfolio.getId());
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                portfolio.getCompanies().add(companyService.select(resultSet.getLong("companyPK")));
-            }
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
-        } finally {
-            DBUtils.close(resultSet);
-            DBUtils.close(statement);
-            DBUtils.close(connection);
-        }
-
     }
 
     /*
@@ -271,9 +216,41 @@ public class PortfolioDAOImpl implements PortfolioDAO {
             DBUtils.close(statement);
             DBUtils.close(connection);
         }
-        populatePortfolioCompanies(portfolio);
-        populatePortfolioIndustries(portfolio);
+        companyService.populatePortfolioCompanies(portfolio);
+        industryService.populatePortfolioIndustries(portfolio);
         return portfolio;
 
+    }
+
+    @Override
+    public final List<String> getStreamTokens(final long id) {
+        List<String> tokens = new ArrayList<String>();
+        String sql = "select tag as tags from company_tags as ctags where"
+                + " ctags.company in(select companyPK from portfolio_company as pc"
+                + " where pc.portfolioPC=" + id
+                + ") union select nameCompany as tags from Company where"
+                + " idCompany in (select companyPK from portfolio_company "
+                + "as pc where pc.portfolioPC=" + id + ")"
+                + " union select nameCompany as tags from Company where"
+                + " idCompany in (select companyIC from industry_company "
+                + "as ic where ic.industryIC in"
+                + " (select industryPI from portfolio_industry as pi where pi.portfolioPI=" + id
+                + "));";
+        LOGGER.info(sql);
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(sql);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                tokens.add(resultSet.getString("tags"));
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e.getMessage());
+        } finally {
+            DBUtils.close(resultSet);
+            DBUtils.close(statement);
+            DBUtils.close(connection);
+        }
+        return tokens;
     }
 }

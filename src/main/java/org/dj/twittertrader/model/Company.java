@@ -2,9 +2,10 @@ package org.dj.twittertrader.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The Class Company is an entity.
@@ -23,8 +24,16 @@ public class Company {
     /** The tweets. */
     private List<Tweet> tweets;
 
+    /** The stock symbol. */
+    private String stockSymbol;
+
+    /** The stock currency. */
+    private String stockCurrency;
     /** The stock price. */
     private double stockPrice;
+
+    /** The industry. */
+    private String industry;
 
     /**
      * The tags. A tag is a word that is associated with the company example for
@@ -43,6 +52,45 @@ public class Company {
      */
     public Company() {
         super();
+    }
+
+    /**
+     * Gets the tweets today.
+     * 
+     * @return the tweets today
+     */
+    public final int getTweetsWeek() {
+        Calendar startOfWeek = Calendar.getInstance();
+        startOfWeek.set(Calendar.HOUR_OF_DAY, 0);
+        startOfWeek.set(Calendar.MINUTE, 0);
+        startOfWeek.set(Calendar.SECOND, 0);
+        startOfWeek.add(Calendar.DATE, ((startOfWeek.get(Calendar.DAY_OF_WEEK) - 1) * -1));
+        int count = 0;
+        for (Tweet t : tweets) {
+            if (t.getCreatedAt().after(startOfWeek.getTime())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Gets the tweets today.
+     * 
+     * @return the tweets today
+     */
+    public final int getTweetsToday() {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        int count = 0;
+        for (Tweet t : tweets) {
+            if (t.getCreatedAt().after(today.getTime())) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
@@ -193,6 +241,64 @@ public class Company {
      */
     public final void setActive(final boolean active) {
         this.active = active;
+    }
+
+    /**
+     * @return the latestTweets
+     */
+    public final List<Tweet> getLatestTweets() {
+        return Tweet.getLatestTweets(tweets);
+    }
+
+    /**
+     * @return the mostInfluentialTweets
+     */
+    public final List<Tweet> getMostInfluentialTweets() {
+        return Tweet.getMostInfluentialTweets(tweets);
+    }
+
+    /**
+     * Gets the most detrimental tweets.
+     * 
+     * @return the most detrimental tweets
+     */
+    public final List<Tweet> getMostDetrimentalTweets() {
+        return Tweet.getMostDetrimentalTweets(tweets);
+    }
+
+    /**
+     * Gets the stock symbol.
+     * 
+     * @return the stock symbol
+     */
+    public final String getStockSymbol() {
+        return stockSymbol;
+    }
+
+    /**
+     * Sets the stock symbol.
+     * 
+     * @param stockSymbol
+     *            the new stock symbol
+     */
+    public final void setStockSymbol(final String stockSymbol) {
+        this.stockSymbol = stockSymbol;
+    }
+
+    public String getStockCurrency() {
+        return stockCurrency;
+    }
+
+    public void setStockCurrency(String stockCurrency) {
+        this.stockCurrency = stockCurrency;
+    }
+
+    public String getIndustry() {
+        return industry;
+    }
+
+    public void setIndustry(String industry) {
+        this.industry = industry;
     }
 
     /**

@@ -69,4 +69,13 @@ public interface PortfolioService {
      */
     void setPortfolioDAO(PortfolioDAO portfolioDAO);
 
+    /**
+     * Gets the stream tokens.
+     * 
+     * @param id
+     *            the id
+     * @return the stream tokens
+     */
+    List<String> getStreamTokens(long id);
+
 }

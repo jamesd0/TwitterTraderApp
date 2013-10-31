@@ -60,4 +60,13 @@ public interface PortfolioDAO {
      */
     Portfolio login(String username, String password);
 
+    /**
+     * Select snapshot.
+     * 
+     * @param id
+     *            the id
+     * @return the list
+     */
+    List<String> getStreamTokens(long id);
+
 }

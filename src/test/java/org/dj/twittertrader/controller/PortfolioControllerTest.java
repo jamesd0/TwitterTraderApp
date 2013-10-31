@@ -7,10 +7,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -88,59 +86,59 @@ public class PortfolioControllerTest {
         verifyNoMoreInteractions(portfolioService);
     }
 
-    /**
-     * Test for valid createPortfolio request.
-     * 
-     * @throws Exception
-     *             the exception
-     */
-    @Test
-    public final void createPortfolioSuccess() throws Exception {
-        standaloneSetup(controller)
-                .build()
-                .perform(
-                        post("/portfolio/createPortfolio").contentType(
-                                TestUtil.APPLICATION_JSON_UTF8).content(Portfolio.toJson(first)))
-                .andExpect(status().isCreated());
-        verify(portfolioService, times(1)).create(first);
-        verifyNoMoreInteractions(portfolioService);
-    }
+    // /**
+    // * Test for valid createPortfolio request.
+    // *
+    // * @throws Exception
+    // * the exception
+    // */
+    // @Test
+    // public final void createPortfolioSuccess() throws Exception {
+    // standaloneSetup(controller)
+    // .build()
+    // .perform(
+    // post("/portfolio/createPortfolio").contentType(
+    // TestUtil.APPLICATION_JSON_UTF8).content(Portfolio.toJson(first)))
+    // .andExpect(status().isCreated());
+    // verify(portfolioService, times(1)).create(first);
+    // verifyNoMoreInteractions(portfolioService);
+    // }
 
-    /**
-     * Test for valid updatePortfolio request.
-     * 
-     * @throws Exception
-     *             the exception
-     */
-    @Test
-    public final void updatePortfolioSuccess() throws Exception {
-        standaloneSetup(controller)
-                .build()
-                .perform(
-                        put("/portfolio/updatePortfolio").contentType(
-                                TestUtil.APPLICATION_JSON_UTF8).content(Portfolio.toJson(first)))
-                .andExpect(status().isNoContent());
-        verify(portfolioService, times(1)).update(first);
-        verifyNoMoreInteractions(portfolioService);
-    }
+    // /**
+    // * Test for valid updatePortfolio request.
+    // *
+    // * @throws Exception
+    // * the exception
+    // */
+    // @Test
+    // public final void updatePortfolioSuccess() throws Exception {
+    // standaloneSetup(controller)
+    // .build()
+    // .perform(
+    // put("/portfolio/updatePortfolio").contentType(
+    // TestUtil.APPLICATION_JSON_UTF8).content(Portfolio.toJson(first)))
+    // .andExpect(status().isNoContent());
+    // verify(portfolioService, times(1)).update(first);
+    // verifyNoMoreInteractions(portfolioService);
+    // }
 
-    /**
-     * Test for valid deletePortfolio request.
-     * 
-     * @throws Exception
-     *             the exception
-     */
-    @Test
-    public final void deletePortfolioSuccess() throws Exception {
-        standaloneSetup(controller)
-                .build()
-                .perform(
-                        delete("/portfolio/deletePortfolio").contentType(
-                                TestUtil.APPLICATION_JSON_UTF8).content(Portfolio.toJson(first)))
-                .andExpect(status().isNoContent());
-        verify(portfolioService, times(1)).delete(first);
-        verifyNoMoreInteractions(portfolioService);
-    }
+    // /**
+    // * Test for valid deletePortfolio request.
+    // *
+    // * @throws Exception
+    // * the exception
+    // */
+    // @Test
+    // public final void deletePortfolioSuccess() throws Exception {
+    // standaloneSetup(controller)
+    // .build()
+    // .perform(
+    // delete("/portfolio/deletePortfolio").contentType(
+    // TestUtil.APPLICATION_JSON_UTF8).content(Portfolio.toJson(first)))
+    // .andExpect(status().isNoContent());
+    // verify(portfolioService, times(1)).delete(first);
+    // verifyNoMoreInteractions(portfolioService);
+    // }
 
     /**
      * Login success.

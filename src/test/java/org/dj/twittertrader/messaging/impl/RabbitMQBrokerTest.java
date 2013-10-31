@@ -21,6 +21,12 @@ import com.rabbitmq.client.ConnectionFactory;
  */
 public class RabbitMQBrokerTest {
 
+    /** The Constant EXCHANGE_NAME. */
+    private static final String EXCHANGE_NAME = "twittertrader-exchange";
+
+    /** The Constant ROUTING_KEY. */
+    private static final String ROUTING_KEY = "routingKey";
+
     /** The broker. */
     private RabbitMQBroker broker;
 
@@ -59,7 +65,7 @@ public class RabbitMQBrokerTest {
     @Test
     public final void testSingleUpload() throws IOException {
         broker.upload("This is a test message".getBytes());
-        verify(channel, times(1)).basicPublish("", "twitter.trader", null,
+        verify(channel, times(1)).basicPublish(EXCHANGE_NAME, ROUTING_KEY, null,
                 "This is a test message".getBytes());
         assertEquals(broker.isInitialised(), true);
         verify(connection, times(1)).createChannel();
@@ -79,9 +85,9 @@ public class RabbitMQBrokerTest {
     public final void testMultipleUpload() throws IOException {
         broker.upload("This is a test message".getBytes());
         broker.upload("This is a second test message".getBytes());
-        verify(channel, times(1)).basicPublish("", "twitter.trader", null,
+        verify(channel, times(1)).basicPublish(EXCHANGE_NAME, ROUTING_KEY, null,
                 "This is a test message".getBytes());
-        verify(channel, times(1)).basicPublish("", "twitter.trader", null,
+        verify(channel, times(1)).basicPublish(EXCHANGE_NAME, ROUTING_KEY, null,
                 "This is a second test message".getBytes());
         assertEquals(broker.isInitialised(), true);
         verify(connection, times(1)).createChannel();
@@ -102,7 +108,7 @@ public class RabbitMQBrokerTest {
         broker.setInitialised(true);
         broker.setChannel(channel);
         broker.upload("This is a test message".getBytes());
-        verify(channel, times(1)).basicPublish("", "twitter.trader", null,
+        verify(channel, times(1)).basicPublish(EXCHANGE_NAME, ROUTING_KEY, null,
                 "This is a test message".getBytes());
         assertEquals(broker.isInitialised(), true);
         verify(connection, times(0)).createChannel();

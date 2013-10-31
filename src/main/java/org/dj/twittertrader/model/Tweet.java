@@ -1,11 +1,17 @@
 package org.dj.twittertrader.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import org.dj.twittertrader.utils.SortByTweetDate;
+import org.dj.twittertrader.utils.SortByTweetScore;
 
 import twitter4j.Status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The Class Tweet.
@@ -61,8 +67,8 @@ public class Tweet {
      * 
      * @return the int
      */
-    private int calculateTweetScore() {
-        return (int) ((1 + retweetCount) * text.hashCode());
+    private long calculateTweetScore() {
+        return ((1 + retweetCount) + text.length() + user.getUserScore());
     }
 
     /**
@@ -296,4 +302,75 @@ public class Tweet {
         return true;
     }
 
+    /**
+     * Gets the latest tweets.
+     * 
+     * @param tweets
+     *            the tweets
+     * @return the latest tweets
+     */
+    public static List<Tweet> getLatestTweets(final List<Tweet> tweets) {
+        List<Tweet> list = new ArrayList<Tweet>();
+        if (tweets.size() > 0) {
+            Collections.sort(tweets, Collections.reverseOrder(new SortByTweetDate()));
+            if (tweets.size() < 10) {
+                for (Tweet t : tweets) {
+                    list.add(t);
+                }
+            } else {
+                for (Tweet t : tweets.subList(0, 10)) {
+                    list.add(t);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Gets the most influential tweets.
+     * 
+     * @param tweets
+     *            the tweets
+     * @return the most influential tweets
+     */
+    public static List<Tweet> getMostInfluentialTweets(final List<Tweet> tweets) {
+        List<Tweet> list = new ArrayList<Tweet>();
+        if (tweets.size() > 0) {
+            Collections.sort(tweets, Collections.reverseOrder(new SortByTweetScore()));
+            if (tweets.size() < 10) {
+                for (Tweet t : tweets) {
+                    list.add(t);
+                }
+            } else {
+                for (Tweet t : tweets.subList(0, 10)) {
+                    list.add(t);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Gets the most detrimental tweets.
+     * 
+     * @param tweets
+     *            the tweets
+     * @return the most detrimental tweets
+     */
+    public static List<Tweet> getMostDetrimentalTweets(final List<Tweet> tweets) {
+        List<Tweet> list = new ArrayList<Tweet>();
+        if (tweets.size() > 0) {
+            Collections.sort(tweets, new SortByTweetScore());
+            if (tweets.size() < 10) {
+                for (Tweet t : tweets) {
+                    list.add(t);
+                }
+            } else {
+                for (Tweet t : tweets.subList(0, 10)) {
+                    list.add(t);
+                }
+            }
+        }
+        return list;
+    }
 }

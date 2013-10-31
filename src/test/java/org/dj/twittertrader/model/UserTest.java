@@ -69,7 +69,9 @@ public class UserTest {
         assertEquals(user.getScreenName(), "ScreenName");
         assertEquals(user.isVerified(), true);
         assertEquals(user.isActive(), true);
-        assertEquals(user.getUserScore(), TEST_INT * TEST_INT * TEST_INT * 10);
+        assertEquals(user.getUserScore(),
+                (tUser.getFollowersCount() + tUser.getFriendsCount() + tUser.getFavouritesCount())
+                        * (tUser.isVerified() ? 10 : 1));
     }
 
     /**

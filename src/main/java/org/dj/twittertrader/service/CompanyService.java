@@ -1,9 +1,12 @@
 package org.dj.twittertrader.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.dj.twittertrader.dao.CompanyDAO;
 import org.dj.twittertrader.model.Company;
+import org.dj.twittertrader.model.Industry;
+import org.dj.twittertrader.model.Portfolio;
 import org.dj.twittertrader.model.Tweet;
 
 /**
@@ -68,5 +71,33 @@ public interface CompanyService {
      *            the tweet
      */
     void addTweetToCompany(Company company, Tweet tweet);
+
+    /**
+     * Adds the stock price.
+     * 
+     * @param company
+     *            the company
+     * @param stockPrice
+     *            the stock price
+     * @param date
+     *            the date
+     */
+    void addStockPrice(Company company, double stockPrice, Date date);
+
+    /**
+     * Populate portfolio companies.
+     * 
+     * @param portfolio
+     *            the portfolio
+     */
+    void populatePortfolioCompanies(Portfolio portfolio);
+
+    /**
+     * Populate industry companies.
+     * 
+     * @param industry
+     *            the industry
+     */
+    void populateIndustryCompanies(Industry industry);
 
 }

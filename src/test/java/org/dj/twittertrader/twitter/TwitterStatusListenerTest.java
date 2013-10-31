@@ -1,6 +1,7 @@
 package org.dj.twittertrader.twitter;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.dj.twittertrader.finance.FinanceDataReceiver;
 import org.dj.twittertrader.messaging.MessagingBroker;
 import org.dj.twittertrader.model.Company;
 import org.dj.twittertrader.model.Tweet;
@@ -25,6 +27,7 @@ import org.slf4j.Logger;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.User;
+import twitter4j.internal.org.json.JSONException;
 
 /**
  * The Class TwitterStatusListenerTest.
@@ -60,6 +63,8 @@ public class TwitterStatusListenerTest {
     /** The company second. */
     private Company companySecond;
 
+    private FinanceDataReceiver financeReceiver;
+
     /**
      * Sets the up.
      */
@@ -70,12 +75,14 @@ public class TwitterStatusListenerTest {
         tweetService = mock(TweetService.class);
         userService = mock(UserService.class);
         companyService = mock(CompanyService.class);
+        financeReceiver = mock(FinanceDataReceiver.class);
         logger = mock(Logger.class);
         listener.setBroker(broker);
         listener.setTweetService(tweetService);
         listener.setUserService(userService);
         listener.setCompanyService(companyService);
         listener.setLogger(logger);
+        listener.setFinanceDataReceiver(financeReceiver);
         listener.setInitialiased(false);
         companyFirst = TestUtil.randomCompany();
         companySecond = TestUtil.randomCompany();
@@ -144,10 +151,12 @@ public class TwitterStatusListenerTest {
      * 
      * @throws IOException
      *             Signals that an I/O exception has occurred.
+     * @throws JSONException
      */
     @Test
-    public final void testOnStatus() throws IOException {
+    public final void testOnStatus() throws IOException, JSONException {
         when(companyService.selectAll()).thenReturn(Arrays.asList(companyFirst, companySecond));
+        when(financeReceiver.getStockPrice(anyString())).thenReturn(100.10);
         Status status = mock(Status.class);
         User user = mock(User.class);
         when(status.getUser()).thenReturn(user);
@@ -155,7 +164,7 @@ public class TwitterStatusListenerTest {
         when(status.getCreatedAt()).thenReturn(new Date(123123));
         when(status.getText()).thenReturn("TestText");
         when(user.getLang()).thenReturn("en");
-        when(status.getRetweetCount()).thenReturn((long) 1234123);
+        when(status.getRetweetCount()).thenReturn(1234123);
         when(user.getFollowersCount()).thenReturn(123);
         when(user.getFriendsCount()).thenReturn(12312);
         when(user.getId()).thenReturn((long) 123123);

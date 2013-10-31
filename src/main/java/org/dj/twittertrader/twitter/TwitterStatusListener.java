@@ -4,8 +4,10 @@
 package org.dj.twittertrader.twitter;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
+import org.dj.twittertrader.finance.FinanceDataReceiver;
 import org.dj.twittertrader.messaging.MessagingBroker;
 import org.dj.twittertrader.model.Company;
 import org.dj.twittertrader.model.Tweet;
@@ -21,6 +23,7 @@ import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
+import twitter4j.internal.org.json.JSONException;
 
 /**
  * The listener interface for receiving twitterStatus events. The class that is
@@ -51,6 +54,18 @@ public class TwitterStatusListener implements StatusListener {
     /** The company service. */
     @Autowired
     private CompanyService companyService;
+
+    /** The finance data receiver. */
+    @Autowired
+    private FinanceDataReceiver financeDataReceiver;
+
+    /**
+     * @param financeDataReceiver
+     *            the financeDataReceiver to set
+     */
+    public final void setFinanceDataReceiver(FinanceDataReceiver financeDataReceiver) {
+        this.financeDataReceiver = financeDataReceiver;
+    }
 
     /** The initialiased. */
     private boolean initialised = false;
@@ -118,16 +133,19 @@ public class TwitterStatusListener implements StatusListener {
                         logger.info(status.getText());
                         userService.create(tweet.getUser());
                         tweetService.create(tweet);
-                        company.getTweets().add(tweet);
                         companyService.addTweetToCompany(company, tweet);
-                        company.setCompanyScore(company.calculateScore());
-                        companyService.update(company);
                         try {
-                            // upload a better message to the queue... include
+                            companyService.addStockPrice(company,
+                                    financeDataReceiver.getStockPrice(company.getStockSymbol()),
+                                    new Date());
+                            // upload a better message to the queue...
+                            // include
                             // text and the
                             // company it is about and scores
                             broker.upload(Tweet.toJson(tweet).getBytes());
                         } catch (IOException e) {
+                            logger.error(e.getMessage());
+                        } catch (JSONException e) {
                             logger.error(e.getMessage());
                         }
                     }

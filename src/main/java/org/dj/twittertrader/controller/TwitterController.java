@@ -1,6 +1,7 @@
 package org.dj.twittertrader.controller;
 
-import org.dj.twittertrader.model.Portfolio;
+import java.util.List;
+
 import org.dj.twittertrader.service.PortfolioService;
 import org.dj.twittertrader.twitter.TwitterStatusListener;
 import org.slf4j.Logger;
@@ -50,10 +51,10 @@ public class TwitterController {
         LOGGER.info("Shutting down stream");
         stream.shutdown();
         stream.addListener(listener);
-        Portfolio portfolio = portfolioService.select(id);
-        stream.filter(new FilterQuery(0, new long[0], portfolio.getAllStreamTokens().toArray(
-                new String[portfolio.getAllStreamTokens().size()])));
-        LOGGER.info("Successfully started stream: " + portfolio.getAllStreamTokens());
+        List<String> portfolioTokens = portfolioService.getStreamTokens(id);
+        stream.filter(new FilterQuery(0, new long[0], portfolioTokens
+                .toArray(new String[portfolioTokens.size()])));
+        LOGGER.info("Successfully started stream: " + portfolioTokens);
 
     }
 

@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import java.util.Arrays;
+
 import org.dj.twittertrader.model.Portfolio;
 import org.dj.twittertrader.service.PortfolioService;
 import org.dj.twittertrader.twitter.TwitterStatusListener;
@@ -60,15 +62,14 @@ public class TwitterControllerTest {
      */
     @Test
     public final void startStreamTest() throws Exception {
-        when(portfolioService.select(2)).thenReturn(first);
+        String[] streamTokens = { "CocaCola", "Pepsi", "Twitter" };
+        when(portfolioService.getStreamTokens(2)).thenReturn(Arrays.asList(streamTokens));
         standaloneSetup(controller).build().perform(get("/twitter/start/2"))
                 .andExpect(status().isOk());
         verify(stream, times(1)).shutdown();
         verify(stream, times(1)).addListener(listener);
-        verify(portfolioService, times(1)).select(2);
-        verify(stream, times(1)).filter(
-                new FilterQuery(0, new long[0], first.getAllStreamTokens().toArray(
-                        new String[first.getAllStreamTokens().size()])));
+        verify(portfolioService, times(1)).getStreamTokens(2);
+        verify(stream, times(1)).filter(new FilterQuery(0, new long[0], streamTokens));
         verifyNoMoreInteractions(portfolioService);
         verifyNoMoreInteractions(stream);
         verifyNoMoreInteractions(listener);

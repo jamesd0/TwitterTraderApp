@@ -7,10 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -94,55 +91,55 @@ public class CompanyControllerTest {
         verifyNoMoreInteractions(companyService);
     }
 
-    /**
-     * Test for valid createCompany request.
-     * 
-     * @throws Exception
-     *             the exception
-     */
-    @Test
-    public final void createCompanySuccess() throws Exception {
-        standaloneSetup(controller)
-                .build()
-                .perform(
-                        post("/company/createCompany").contentType(TestUtil.APPLICATION_JSON_UTF8)
-                                .content(Company.toJson(first))).andExpect(status().isCreated());
-        verify(companyService, times(1)).create(first);
-        verifyNoMoreInteractions(companyService);
-    }
+    // /**
+    // * Test for valid createCompany request.
+    // *
+    // * @throws Exception
+    // * the exception
+    // */
+    // @Test
+    // public final void createCompanySuccess() throws Exception {
+    // standaloneSetup(controller)
+    // .build()
+    // .perform(
+    // post("/company/createCompany").contentType(TestUtil.APPLICATION_JSON_UTF8)
+    // .content(Company.toJson(first))).andExpect(status().isCreated());
+    // verify(companyService, times(1)).create(first);
+    // verifyNoMoreInteractions(companyService);
+    // }
 
-    /**
-     * Test for valid updateCompany request.
-     * 
-     * @throws Exception
-     *             the exception
-     */
-    @Test
-    public final void updateCompanySuccess() throws Exception {
-        standaloneSetup(controller)
-                .build()
-                .perform(
-                        put("/company/updateCompany").contentType(TestUtil.APPLICATION_JSON_UTF8)
-                                .content(Company.toJson(first))).andExpect(status().isNoContent());
-        verify(companyService, times(1)).update(first);
-        verifyNoMoreInteractions(companyService);
-    }
+    // /**
+    // * Test for valid updateCompany request.
+    // *
+    // * @throws Exception
+    // * the exception
+    // */
+    // @Test
+    // public final void updateCompanySuccess() throws Exception {
+    // standaloneSetup(controller)
+    // .build()
+    // .perform(
+    // put("/company/updateCompany").contentType(TestUtil.APPLICATION_JSON_UTF8)
+    // .content(Company.toJson(first))).andExpect(status().isNoContent());
+    // verify(companyService, times(1)).update(first);
+    // verifyNoMoreInteractions(companyService);
+    // }
 
-    /**
-     * Test for valid deleteCompany request.
-     * 
-     * @throws Exception
-     *             the exception
-     */
-    @Test
-    public final void deleteCompanySuccess() throws Exception {
-        standaloneSetup(controller)
-                .build()
-                .perform(
-                        delete("/company/deleteCompany")
-                                .contentType(TestUtil.APPLICATION_JSON_UTF8).content(
-                                        Company.toJson(first))).andExpect(status().isNoContent());
-        verify(companyService, times(1)).delete(first);
-        verifyNoMoreInteractions(companyService);
-    }
+    // /**
+    // * Test for valid deleteCompany request.
+    // *
+    // * @throws Exception
+    // * the exception
+    // */
+    // @Test
+    // public final void deleteCompanySuccess() throws Exception {
+    // standaloneSetup(controller)
+    // .build()
+    // .perform(
+    // delete("/company/deleteCompany")
+    // .contentType(TestUtil.APPLICATION_JSON_UTF8).content(
+    // Company.toJson(first))).andExpect(status().isNoContent());
+    // verify(companyService, times(1)).delete(first);
+    // verifyNoMoreInteractions(companyService);
+    // }
 }

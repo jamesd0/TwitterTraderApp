@@ -1,10 +1,10 @@
 package org.dj.twittertrader.model;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The Class Industry.
@@ -25,6 +25,77 @@ public class Industry {
 
     /** The active. */
     private boolean active;
+
+    /** The tweets. */
+    private List<Tweet> tweets;
+
+    /** The stream tokens. */
+    private List<String> streamTokens;
+
+    /**
+     * Gets the number of tweets.
+     * 
+     * @return the number of tweets
+     */
+    public final int getNumberOfTweets() {
+        int value = 0;
+        for (Company company : companies) {
+            value += company.getTweets().size();
+        }
+        return value;
+    }
+
+    /**
+     * Gets the score.
+     * 
+     * @return the score
+     */
+    public final long getScore() {
+        long score = 0;
+        for (Tweet t : tweets) {
+            score += t.getTweetScore();
+        }
+        return score;
+    }
+
+    /**
+     * Gets the tweets today.
+     * 
+     * @return the tweets today
+     */
+    public final int getTweetsWeek() {
+        Calendar startOfWeek = Calendar.getInstance();
+        startOfWeek.set(Calendar.HOUR_OF_DAY, 0);
+        startOfWeek.set(Calendar.MINUTE, 0);
+        startOfWeek.set(Calendar.SECOND, 0);
+        startOfWeek.add(Calendar.DATE, ((startOfWeek.get(Calendar.DAY_OF_WEEK) - 1) * -1));
+        int count = 0;
+        for (Tweet t : tweets) {
+            if (t.getCreatedAt().after(startOfWeek.getTime())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Gets the tweets today.
+     * 
+     * @return the tweets today
+     */
+    public final int getTweetsToday() {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        int count = 0;
+        for (Tweet t : tweets) {
+            if (t.getCreatedAt().after(today.getTime())) {
+                count++;
+            }
+        }
+        return count;
+    }
 
     /**
      * Gets the id.
@@ -119,6 +190,52 @@ public class Industry {
      */
     public final void setActive(final boolean active) {
         this.active = active;
+    }
+
+    /**
+     * Gets the tweets.
+     * 
+     * @return the tweets
+     */
+    public final List<Tweet> getTweets() {
+        return tweets;
+    }
+
+    /**
+     * Sets the tweets.
+     * 
+     * @param tweets
+     *            the tweets to set
+     */
+    public final void setTweets(final List<Tweet> tweets) {
+        this.tweets = tweets;
+    }
+
+    /**
+     * Gets the latest tweets.
+     * 
+     * @return the latestTweets
+     */
+    public final List<Tweet> getLatestTweets() {
+        return Tweet.getLatestTweets(tweets);
+    }
+
+    /**
+     * Gets the most influential tweets.
+     * 
+     * @return the mostInfluentialTweets
+     */
+    public final List<Tweet> getMostInfluentialTweets() {
+        return Tweet.getMostInfluentialTweets(tweets);
+    }
+
+    /**
+     * Gets the most detrimental tweets.
+     * 
+     * @return the mostDetrimentalTweets
+     */
+    public final List<Tweet> getMostDetrimentalTweets() {
+        return Tweet.getMostDetrimentalTweets(tweets);
     }
 
     /**
@@ -217,11 +334,17 @@ public class Industry {
      * @return the stream tokens
      */
     public final List<String> getStreamTokens() {
-        List<String> list = new ArrayList<String>();
-        for (Company company : getCompanies()) {
-            list.addAll(company.getStreamTokens());
-        }
-        return list;
+        return streamTokens;
+    }
+
+    /**
+     * Sets the stream tokens.
+     * 
+     * @param streamTokens
+     *            the streamTokens to set
+     */
+    public final void setStreamTokens(final List<String> streamTokens) {
+        this.streamTokens = streamTokens;
     }
 
 }

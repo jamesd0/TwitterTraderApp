@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.dj.twittertrader.dao.IndustryDAO;
 import org.dj.twittertrader.model.Industry;
+import org.dj.twittertrader.model.Portfolio;
 import org.dj.twittertrader.service.IndustryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,22 +20,12 @@ public class IndustryServiceImpl implements IndustryService {
     @Autowired
     private IndustryDAO industryDAO;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.dj.twittertrader.service.IndustryService#selectAll()
-     */
     @Override
     @Transactional
     public final List<Industry> selectAll() {
         return industryDAO.selectAll();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.dj.twittertrader.service.IndustryService#select(long)
-     */
     @Override
     @Transactional
     public final Industry select(final long id) {
@@ -56,6 +47,7 @@ public class IndustryServiceImpl implements IndustryService {
      * @param industryDAO
      *            the industryDAO to set
      */
+    @Override
     public final void setIndustryDAO(final IndustryDAO industryDAO) {
         this.industryDAO = industryDAO;
     }
@@ -67,13 +59,6 @@ public class IndustryServiceImpl implements IndustryService {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.dj.twittertrader.service.IndustryService#update(org.dj.twittertrader
-     * .model.Industry)
-     */
     @Override
     @Transactional
     public final void update(final Industry industry) {
@@ -85,6 +70,13 @@ public class IndustryServiceImpl implements IndustryService {
     @Transactional
     public final void create(final Industry industry) {
         industryDAO.create(industry);
+
+    }
+
+    @Override
+    @Transactional
+    public final void populatePortfolioIndustries(final Portfolio portfolio) {
+        industryDAO.populatePortfolioIndustries(portfolio);
 
     }
 }

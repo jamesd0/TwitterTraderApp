@@ -2,9 +2,10 @@ package org.dj.twittertrader.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The Class Portfolio.
@@ -32,20 +33,107 @@ public class Portfolio {
     /** The active. */
     private boolean active;
 
+    /** The description. */
+    // TODO: Make sure this gets saved in the database
+    private String description;
+
     /**
-     * Gets the all stream tokens.
+     * Gets the number of tweets.
      * 
-     * @return the all stream tokens
+     * @return the number of tweets
      */
-    public final List<String> getAllStreamTokens() {
-        List<String> list = new ArrayList<String>();
+    public final int getNumberOfTweets() {
+        return getAllTweets().size();
+    }
+
+    /**
+     * Gets the portfolio score.
+     * 
+     * @return the portfolio score
+     */
+    public final long getPortfolioScore() {
+        long score = 0;
+        for (Tweet t : getAllTweets()) {
+            score += t.getTweetScore();
+        }
+        return score;
+    }
+
+    /**
+     * Gets the tweets today.
+     * 
+     * @return the tweets today
+     */
+    public final int getTweetsWeek() {
+        Calendar startOfWeek = Calendar.getInstance();
+        startOfWeek.set(Calendar.HOUR_OF_DAY, 0);
+        startOfWeek.set(Calendar.MINUTE, 0);
+        startOfWeek.set(Calendar.SECOND, 0);
+        startOfWeek.add(Calendar.DATE, ((startOfWeek.get(Calendar.DAY_OF_WEEK) - 1) * -1));
+        int count = 0;
+        for (Tweet t : getAllTweets()) {
+            if (t.getCreatedAt().after(startOfWeek.getTime())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Gets the tweets today.
+     * 
+     * @return the tweets today
+     */
+    public final int getTweetsToday() {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        int count = 0;
+        for (Tweet t : getAllTweets()) {
+            if (t.getCreatedAt().after(today.getTime())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Gets all tweets.
+     * 
+     * @return the all tweets
+     */
+    private List<Tweet> getAllTweets() {
+        List<Tweet> tweets = new ArrayList<Tweet>();
         for (Company company : companies) {
-            list.addAll(company.getStreamTokens());
+            tweets.addAll(company.getTweets());
         }
         for (Industry industry : industries) {
-            list.addAll(industry.getStreamTokens());
+            tweets.addAll(industry.getTweets());
         }
-        return list;
+        return tweets;
+    }
+
+    /**
+     * @return the latestTweets
+     */
+    public final List<Tweet> getLatestTweets() {
+        return Tweet.getLatestTweets(getAllTweets());
+    }
+
+    /**
+     * @return the mostInfluentialTweets
+     */
+    public final List<Tweet> getMostInfluentialTweets() {
+
+        return Tweet.getMostInfluentialTweets(getAllTweets());
+    }
+
+    /**
+     * @return the mostDetrimentalTweets
+     */
+    public final List<Tweet> getMostDetrimentalTweets() {
+        return Tweet.getMostDetrimentalTweets(getAllTweets());
     }
 
     /**
@@ -179,6 +267,24 @@ public class Portfolio {
      */
     public final void setActive(final boolean active) {
         this.active = active;
+    }
+
+    /**
+     * @return the description
+     */
+    public final String getDescription() {
+        description = "This is a dummy description."
+                + " This needs to be removed when functionality for"
+                + " storing in the database has been completed";
+        return description;
+    }
+
+    /**
+     * @param description
+     *            the description to set
+     */
+    public final void setDescription(final String description) {
+        this.description = description;
     }
 
     /**

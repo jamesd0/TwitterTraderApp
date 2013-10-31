@@ -88,9 +88,7 @@ public class CompanyController {
     @RequestMapping(value = "/getCompany/{id}", method = RequestMethod.GET)
     @ResponseBody
     public final Company selectCompany(@PathVariable final long id) {
-        Company company = companyService.select(id);
-        return company;
-
+        return companyService.select(id);
     }
 
     /**

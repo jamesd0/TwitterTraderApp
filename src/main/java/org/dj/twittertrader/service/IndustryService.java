@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.dj.twittertrader.dao.IndustryDAO;
 import org.dj.twittertrader.model.Industry;
+import org.dj.twittertrader.model.Portfolio;
 
 /**
  * The Interface IndustryService.
@@ -58,4 +59,11 @@ public interface IndustryService {
      */
     void setIndustryDAO(IndustryDAO industryDAO);
 
+    /**
+     * Populate portfolio industries.
+     * 
+     * @param portfolio
+     *            the portfolio
+     */
+    void populatePortfolioIndustries(Portfolio portfolio);
 }

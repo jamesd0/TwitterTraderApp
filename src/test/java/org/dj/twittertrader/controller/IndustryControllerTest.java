@@ -7,10 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -94,56 +91,56 @@ public class IndustryControllerTest {
         verifyNoMoreInteractions(industryService);
     }
 
-    /**
-     * Test for valid createIndustry request.
-     * 
-     * @throws Exception
-     *             the exception
-     */
-    @Test
-    public final void createIndustrySuccess() throws Exception {
-        standaloneSetup(controller)
-                .build()
-                .perform(
-                        post("/industry/createIndustry")
-                                .contentType(TestUtil.APPLICATION_JSON_UTF8).content(
-                                        Industry.toJson(first))).andExpect(status().isCreated());
-        verify(industryService, times(1)).create(first);
-        verifyNoMoreInteractions(industryService);
-    }
+    // /**
+    // * Test for valid createIndustry request.
+    // *
+    // * @throws Exception
+    // * the exception
+    // */
+    // @Test
+    // public final void createIndustrySuccess() throws Exception {
+    // standaloneSetup(controller)
+    // .build()
+    // .perform(
+    // post("/industry/createIndustry")
+    // .contentType(TestUtil.APPLICATION_JSON_UTF8).content(
+    // Industry.toJson(first))).andExpect(status().isCreated());
+    // verify(industryService, times(1)).create(first);
+    // verifyNoMoreInteractions(industryService);
+    // }
+    //
+    // /**
+    // * Test for valid updateIndustry request.
+    // *
+    // * @throws Exception
+    // * the exception
+    // */
+    // @Test
+    // public final void updateIndustrySuccess() throws Exception {
+    // standaloneSetup(controller)
+    // .build()
+    // .perform(
+    // put("/industry/updateIndustry").contentType(TestUtil.APPLICATION_JSON_UTF8)
+    // .content(Industry.toJson(first))).andExpect(status().isNoContent());
+    // verify(industryService, times(1)).update(first);
+    // verifyNoMoreInteractions(industryService);
+    // }
 
-    /**
-     * Test for valid updateIndustry request.
-     * 
-     * @throws Exception
-     *             the exception
-     */
-    @Test
-    public final void updateIndustrySuccess() throws Exception {
-        standaloneSetup(controller)
-                .build()
-                .perform(
-                        put("/industry/updateIndustry").contentType(TestUtil.APPLICATION_JSON_UTF8)
-                                .content(Industry.toJson(first))).andExpect(status().isNoContent());
-        verify(industryService, times(1)).update(first);
-        verifyNoMoreInteractions(industryService);
-    }
-
-    /**
-     * Test for valid deleteIndustry request.
-     * 
-     * @throws Exception
-     *             the exception
-     */
-    @Test
-    public final void deleteIndustrySuccess() throws Exception {
-        standaloneSetup(controller)
-                .build()
-                .perform(
-                        delete("/industry/deleteIndustry").contentType(
-                                TestUtil.APPLICATION_JSON_UTF8).content(Industry.toJson(first)))
-                .andExpect(status().isNoContent());
-        verify(industryService, times(1)).delete(first);
-        verifyNoMoreInteractions(industryService);
-    }
+    // /**
+    // * Test for valid deleteIndustry request.
+    // *
+    // * @throws Exception
+    // * the exception
+    // */
+    // @Test
+    // public final void deleteIndustrySuccess() throws Exception {
+    // standaloneSetup(controller)
+    // .build()
+    // .perform(
+    // delete("/industry/deleteIndustry").contentType(
+    // TestUtil.APPLICATION_JSON_UTF8).content(Industry.toJson(first)))
+    // .andExpect(status().isNoContent());
+    // verify(industryService, times(1)).delete(first);
+    // verifyNoMoreInteractions(industryService);
+    // }
 }

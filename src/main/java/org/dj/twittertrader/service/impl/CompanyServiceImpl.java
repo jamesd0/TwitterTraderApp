@@ -1,9 +1,12 @@
 package org.dj.twittertrader.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.dj.twittertrader.dao.CompanyDAO;
 import org.dj.twittertrader.model.Company;
+import org.dj.twittertrader.model.Industry;
+import org.dj.twittertrader.model.Portfolio;
 import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,6 +108,27 @@ public class CompanyServiceImpl implements CompanyService {
     @Transactional
     public final void addTweetToCompany(final Company company, final Tweet tweet) {
         companyDAO.addTweetToCompany(company, tweet);
+
+    }
+
+    @Override
+    @Transactional
+    public final void addStockPrice(final Company company, final double stockPrice, final Date date) {
+        companyDAO.addStockPrice(company, stockPrice, date);
+
+    }
+
+    @Override
+    @Transactional
+    public final void populatePortfolioCompanies(final Portfolio portfolio) {
+        companyDAO.populatePortfolioCompanies(portfolio);
+
+    }
+
+    @Override
+    @Transactional
+    public void populateIndustryCompanies(Industry industry) {
+        companyDAO.populateIndustryCompanies(industry);
 
     }
 }

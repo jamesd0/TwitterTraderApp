@@ -67,6 +67,7 @@ public class PortfolioServiceImpl implements PortfolioService {
      * @param portfolioDAO
      *            the new portfolio dao
      */
+    @Override
     public final void setPortfolioDAO(final PortfolioDAO portfolioDAO) {
         this.portfolioDAO = portfolioDAO;
     }
@@ -75,5 +76,10 @@ public class PortfolioServiceImpl implements PortfolioService {
     @Transactional
     public final Portfolio login(final String username, final String password) {
         return portfolioDAO.login(username, password);
+    }
+
+    @Override
+    public final List<String> getStreamTokens(final long id) {
+        return portfolioDAO.getStreamTokens(id);
     }
 }

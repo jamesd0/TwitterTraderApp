@@ -32,17 +32,10 @@
 
     <beans:bean id="dataSource"
         class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-
-        <beans:property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <beans:property name="url"
-            value="jdbc:mysql://localhost:3306/twittertrader?zeroDateTimeBehavior=convertToNull" />
-        <beans:property name="username" value="twittertrader" />
-        <beans:property name="password" value="manch3ster" />
+        <beans:property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+        <beans:property name="url" value="jdbc:hsqldb:mem" />
+        <beans:property name="username" value="sa" />
+        <beans:property name="password" value="" />
     </beans:bean>
-    <beans:bean id="connectionFactory" class="com.rabbitmq.client.ConnectionFactory">
-        <beans:property name="host" value="localhost" />
-        <beans:property name="port" value="5672" />
-        <beans:property name="username" value="TwitterTrader" />
-        <beans:property name="password" value="password" />
-    </beans:bean>
+    
 </beans:beans>

@@ -3,7 +3,7 @@ package org.dj.twittertrader.model;
 import java.io.IOException;
 import java.util.Date;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The Class User.
@@ -80,7 +80,7 @@ public class User {
      * @return the int
      */
     private long calculateUserScore() {
-        return followersCount * friendsCount * favouritesCount * (verified ? 10 : 1);
+        return (followersCount + friendsCount + favouritesCount) * (verified ? 10 : 1);
     }
 
     /**

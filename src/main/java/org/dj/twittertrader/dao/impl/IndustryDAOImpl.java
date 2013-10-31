@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -12,6 +13,9 @@ import javax.sql.DataSource;
 import org.dj.twittertrader.dao.IndustryDAO;
 import org.dj.twittertrader.model.Company;
 import org.dj.twittertrader.model.Industry;
+import org.dj.twittertrader.model.Portfolio;
+import org.dj.twittertrader.model.Tweet;
+import org.dj.twittertrader.model.User;
 import org.dj.twittertrader.service.CompanyService;
 import org.dj.twittertrader.utils.DBUtils;
 import org.slf4j.Logger;
@@ -148,6 +152,7 @@ public class IndustryDAOImpl implements IndustryDAO {
                 industry.setName(resultSet.getString("nameIndustry"));
                 industry.setDescription(resultSet.getString("descriptionIndustry"));
                 industry.setActive(resultSet.getBoolean("activeIndustry"));
+                industry.setCompanies(new ArrayList<Company>());
                 list.add(industry);
             }
         } catch (SQLException e) {
@@ -158,7 +163,9 @@ public class IndustryDAOImpl implements IndustryDAO {
             DBUtils.close(connection);
         }
         for (Industry industry : list) {
-            industry.setCompanies(getAllIndustryCompanies(industry.getId()));
+            companyService.populateIndustryCompanies(industry);
+            industry.setTweets(getAllIndustryTweets(industry.getId()));
+            industry.setStreamTokens(getIndustryStreamingTokens(industry.getId()));
         }
         return list;
     }
@@ -183,6 +190,7 @@ public class IndustryDAOImpl implements IndustryDAO {
                 industry.setName(resultSet.getString("nameIndustry"));
                 industry.setDescription(resultSet.getString("descriptionIndustry"));
                 industry.setActive(resultSet.getBoolean("activeIndustry"));
+                industry.setCompanies(new ArrayList<Company>());
             }
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());
@@ -191,27 +199,90 @@ public class IndustryDAOImpl implements IndustryDAO {
             DBUtils.close(statement);
             DBUtils.close(connection);
         }
-        industry.setCompanies(getAllIndustryCompanies(industry.getId()));
+        LOGGER.info(industry.toString());
+        if (industry != null) {
+            companyService.populateIndustryCompanies(industry);
+            industry.setTweets(getAllIndustryTweets(industry.getId()));
+            industry.setStreamTokens(getIndustryStreamingTokens(industry.getId()));
+        }
         return industry;
     }
 
     /**
-     * Gets the all industry companies.
+     * Gets the industry streaming tokens.
      * 
      * @param id
      *            the id
-     * @return the all industry companies
+     * @return the industry streaming tokens
      */
-    private List<Company> getAllIndustryCompanies(final long id) {
-        List<Company> companies = new ArrayList<Company>();
-        String sql = "select companyIC from industry_company where industryIC=?";
+    private List<String> getIndustryStreamingTokens(final long id) {
+        List<String> tokens = new ArrayList<String>();
+        String sql = "select tag as tags from company_tags as ctags where"
+                + " ctags.company in(select companyIC from industry_company where industryIC=" + id
+                + ") union select nameCompany as tags from Company where"
+                + " idCompany in (select companyIC from industry_company where industryIC=" + id
+                + ")";
+        LOGGER.info(sql);
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(sql);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                tokens.add(resultSet.getString("tags"));
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e.getMessage());
+        } finally {
+            DBUtils.close(resultSet);
+            DBUtils.close(statement);
+            DBUtils.close(connection);
+        }
+        return tokens;
+    }
+
+    /**
+     * Gets the all industry tweets.
+     * 
+     * @param id
+     *            the id
+     * @return the all industry tweets
+     */
+    private List<Tweet> getAllIndustryTweets(final long id) {
+        List<Tweet> list = new ArrayList<Tweet>();
+        String sql = "SELECT * FROM Tweet as t inner join User as u"
+                + " on t.user=u.idUser where idTweet in"
+                + " (select ct.tweetCT from company_tweet as ct where ct.companyCT in "
+                + "(select companyIC from industry_company where industryIC=?))"
+                + " order by scoreTweet desc";
+        LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(sql);
             statement.setLong(DBUtils.ONE, id);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                companies.add(companyService.select(resultSet.getLong("companyIC")));
+                Tweet tweet = new Tweet();
+                User user = new User();
+                tweet.setId(resultSet.getLong("idTweet"));
+                tweet.setCreatedAt(new Date(resultSet.getLong("createdAtTweet")));
+                tweet.setText(resultSet.getString("text"));
+                tweet.setRetweetCount(resultSet.getLong("retweetCount"));
+                tweet.setTweetScore(resultSet.getLong("scoreTweet"));
+                tweet.setActive(resultSet.getBoolean("activeTweet"));
+                user.setId(resultSet.getLong("idUser"));
+                user.setName(resultSet.getString("nameUser"));
+                user.setScreenName(resultSet.getString("screenName"));
+                user.setFollowersCount(resultSet.getInt("followersCount"));
+                user.setFriendsCount(resultSet.getInt("friendsCount"));
+                user.setFavouritesCount(resultSet.getInt("favouritesCount"));
+                user.setVerified(resultSet.getBoolean("verified"));
+                user.setLang(resultSet.getString("lang"));
+                user.setCreatedAt(new Date(resultSet.getLong("createdAtUser")));
+                user.setLocation(resultSet.getString("locationUser"));
+                user.setUserScore(resultSet.getLong("scoreUser"));
+                user.setActive(resultSet.getBoolean("activeUser"));
+                tweet.setUser(user);
+                list.add(tweet);
             }
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());
@@ -220,6 +291,41 @@ public class IndustryDAOImpl implements IndustryDAO {
             DBUtils.close(statement);
             DBUtils.close(connection);
         }
-        return companies;
+        return list;
+    }
+
+    @Override
+    public final void populatePortfolioIndustries(final Portfolio portfolio) {
+        List<Industry> industries = new ArrayList<Industry>();
+        String sql = "SELECT * FROM Industry where activeIndustry=1 and idIndustry in "
+                + "(select industryPI from portfolio_industry where portfolioPI=?)";
+        LOGGER.info(sql);
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setLong(DBUtils.ONE, portfolio.getId());
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Industry industry = new Industry();
+                industry.setId(resultSet.getLong("idIndustry"));
+                industry.setName(resultSet.getString("nameIndustry"));
+                industry.setDescription(resultSet.getString("descriptionIndustry"));
+                industry.setActive(resultSet.getBoolean("activeIndustry"));
+                industry.setCompanies(new ArrayList<Company>());
+                industries.add(industry);
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e.getMessage());
+        } finally {
+            DBUtils.close(resultSet);
+            DBUtils.close(statement);
+            DBUtils.close(connection);
+        }
+        for (Industry industry : industries) {
+            companyService.populateIndustryCompanies(industry);
+            industry.setTweets(getAllIndustryTweets(industry.getId()));
+            industry.setStreamTokens(getIndustryStreamingTokens(industry.getId()));
+        }
+        portfolio.getIndustries().addAll(industries);
     }
 }

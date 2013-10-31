@@ -16,13 +16,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.TimeZone;
 
 import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.service.TweetService;
 import org.dj.twittertrader.utils.TestUtil;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The Class TweetControllerTest.
@@ -36,7 +40,7 @@ public class TweetControllerTest {
 
     /** The first. */
     private Tweet first;
-
+    private ObjectMapper mapper;
     /** The second. */
     private Tweet second;
 
@@ -50,6 +54,8 @@ public class TweetControllerTest {
         controller = new TweetController();
         tweetService = mock(TweetService.class);
         controller.setTweetService(tweetService);
+        mapper = new ObjectMapper().setDateFormat(new SimpleDateFormat("HH:mm:ss,dd/MM"))
+                .setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
     /**
