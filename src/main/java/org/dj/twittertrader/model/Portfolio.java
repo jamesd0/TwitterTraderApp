@@ -51,6 +51,7 @@ public class Portfolio {
      * 
      * @return the portfolio score
      */
+
     public final long getPortfolioScore() {
         long score = 0;
         for (Tweet t : getAllTweets()) {
