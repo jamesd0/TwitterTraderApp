@@ -66,7 +66,11 @@
 			<artifactId>aspectjrt</artifactId>
 			<version>${org.aspectj-version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>edu.cmu.cs</groupId>
+			<artifactId>ark-tweet-nlp</artifactId>
+			<version>0.3.2</version>
+		</dependency>
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -188,6 +192,11 @@
 					<groupId>org.hamcrest</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jazzy</groupId>
+			<artifactId>jazzy</artifactId>
+			<version>LATEST</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>

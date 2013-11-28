@@ -1,20 +1,24 @@
 package org.dj.twittertrader.swn;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
+import org.springframework.stereotype.Component;
+
+import cmu.arktweetnlp.util.BasicFileIO;
+
 /**
  * The Class SentiWordNet.
  */
+@Component
 public class SentiWordNet {
 
     /** The path to swn. */
-    private String pathToSWN = "src/main/resources/SentiWordNet.txt";
+    private String pathToSWN = "/SentiWordNet.txt";
 
     /** The _dict. */
     private HashMap<String, Double> dictionary;
@@ -30,7 +34,7 @@ public class SentiWordNet {
         dictionary = new HashMap<String, Double>();
         HashMap<String, Vector<Double>> temporary = new HashMap<String, Vector<Double>>();
         try {
-            csv = new BufferedReader(new FileReader(pathToSWN));
+            csv = BasicFileIO.openFileOrResource(pathToSWN);
             String line = "";
             while ((line = csv.readLine()) != null) {
                 String[] data = line.split("\t");
@@ -94,7 +98,7 @@ public class SentiWordNet {
      *            the pos
      * @return the double
      */
-    public final Double extract(final String word) {
-        return dictionary.get(word);
+    public final Double extract(final String word, final String pos) {
+        return dictionary.get(word + "#" + pos);
     }
 }

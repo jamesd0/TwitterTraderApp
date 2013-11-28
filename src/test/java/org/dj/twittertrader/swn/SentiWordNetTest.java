@@ -35,7 +35,7 @@ public class SentiWordNetTest {
      */
     @Test
     public final void testAmazingAdj() {
-        Double score = sentiWordNet.extract("amazing#a");
+        Double score = sentiWordNet.extract("amazing", "a");
         assertEquals(score, AMAZING_ADJ, DELTA);
     }
 
@@ -44,7 +44,7 @@ public class SentiWordNetTest {
      */
     @Test
     public final void testAmazingVer() {
-        Double score = sentiWordNet.extract("amazing#v");
+        Double score = sentiWordNet.extract("amazing", "v");
         assertNull(score);
     }
 

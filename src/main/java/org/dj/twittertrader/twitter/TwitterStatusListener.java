@@ -63,7 +63,7 @@ public class TwitterStatusListener implements StatusListener {
      * @param financeDataReceiver
      *            the financeDataReceiver to set
      */
-    public final void setFinanceDataReceiver(FinanceDataReceiver financeDataReceiver) {
+    public final void setFinanceDataReceiver(final FinanceDataReceiver financeDataReceiver) {
         this.financeDataReceiver = financeDataReceiver;
     }
 
