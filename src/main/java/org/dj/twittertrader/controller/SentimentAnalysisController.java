@@ -39,7 +39,7 @@ public class SentimentAnalysisController {
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public final void test() {
-        String text = "love hate good bad Duncan hellp misery freedom m8 PMFJI";
+        String text = "love hate good bad Duncan hellp misery freedom m8 PMFJI lol";
         List<TaggedToken> tokens = tagger.tokenizeAndTag(text);
         for (TaggedToken token : tokens) {
             LOGGER.info("Token: " + token.token + " tag: " + token.tag + " wordnettag: "

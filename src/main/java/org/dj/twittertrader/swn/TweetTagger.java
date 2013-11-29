@@ -62,9 +62,13 @@ public class TweetTagger extends Tagger {
                         Twokenize.tokenizeRawTweetText(aTagger.getDictionary().get(t)));
             }
         }
+        int count = 0;
         for (int i : acronymTokens.keySet()) {
-            tokens.addAll(i, acronymTokens.get(i));
-            tokens.remove(i + acronymTokens.get(i).size());
+            tokens.addAll(i + count, acronymTokens.get(i));
+            if (acronymTokens.get(i).size() > 1) {
+                count += acronymTokens.get(i).size() - 1;
+            }
+            tokens.remove(i + count + 1);
         }
         for (String token : tokens) {
             if (!spellCheckerManager.isValidWord(token)) {
