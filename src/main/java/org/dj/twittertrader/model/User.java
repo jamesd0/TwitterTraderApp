@@ -10,6 +10,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class User {
 
+    /** The Constant AVERAGE_FOLLOWERS. */
+    private static final int AVERAGE_FOLLOWERS = 208;
+
+    /** The Constant AVERAGE_FRIENDS. */
+    private static final int AVERAGE_FRIENDS = 400;
+
+    /** The Constant AVERAGE_FAVOURITES. */
+    private static final int AVERAGE_FAVOURITES = 600;
+
     /** The id. */
     private long id;
 
@@ -41,7 +50,7 @@ public class User {
     private String location;
 
     /** The user score. */
-    private long userScore;
+    private double userScore;
 
     /** The active. */
     private boolean active;
@@ -79,8 +88,9 @@ public class User {
      * 
      * @return the int
      */
-    private long calculateUserScore() {
-        return (followersCount + friendsCount + favouritesCount) * (verified ? 10 : 1);
+    private double calculateUserScore() {
+        return ((followersCount / AVERAGE_FOLLOWERS) + (friendsCount / AVERAGE_FRIENDS) + (favouritesCount / AVERAGE_FAVOURITES))
+                * (verified ? 10 : 1);
     }
 
     /**
@@ -278,7 +288,7 @@ public class User {
      * 
      * @return the user score
      */
-    public final long getUserScore() {
+    public final double getUserScore() {
         return userScore;
     }
 

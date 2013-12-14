@@ -115,7 +115,7 @@ public class UserDAOImpl implements UserDAO {
             statement.setString(DBUtils.EIGHT, user.getLang());
             statement.setLong(DBUtils.NINE, user.getCreatedAt().getTime());
             statement.setString(DBUtils.TEN, user.getLocation());
-            statement.setLong(DBUtils.ELEVEN, user.getUserScore());
+            statement.setDouble(DBUtils.ELEVEN, user.getUserScore());
             statement.setBoolean(DBUtils.TWELVE, user.isActive());
             statement.setString(DBUtils.THIRTEEN, user.getName());
             statement.setString(DBUtils.FOURTEEN, user.getScreenName());
@@ -126,7 +126,7 @@ public class UserDAOImpl implements UserDAO {
             statement.setString(DBUtils.NINETEEN, user.getLang());
             statement.setLong(DBUtils.TWENTY, user.getCreatedAt().getTime());
             statement.setString(DBUtils.TWENTYONE, user.getLocation());
-            statement.setLong(DBUtils.TWENTYTWO, user.getUserScore());
+            statement.setDouble(DBUtils.TWENTYTWO, user.getUserScore());
             statement.setBoolean(DBUtils.TWENTYTHREE, user.isActive());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -158,7 +158,7 @@ public class UserDAOImpl implements UserDAO {
             statement.setString(DBUtils.SEVEN, user.getLang());
             statement.setLong(DBUtils.EIGHT, user.getCreatedAt().getTime());
             statement.setString(DBUtils.NINE, user.getLocation());
-            statement.setLong(DBUtils.TEN, user.getUserScore());
+            statement.setDouble(DBUtils.TEN, user.getUserScore());
             statement.setBoolean(DBUtils.ELEVEN, user.isActive());
             statement.setLong(DBUtils.TWELVE, user.getId());
             statement.executeUpdate();

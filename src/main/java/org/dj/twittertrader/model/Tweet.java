@@ -34,7 +34,7 @@ public class Tweet {
     private long retweetCount;
 
     /** The tweet score. */
-    private long tweetScore;
+    private double tweetScore;
 
     /** The active. */
     private boolean active;
@@ -51,7 +51,7 @@ public class Tweet {
         text = status.getText();
         user = new User(status.getUser());
         retweetCount = status.getRetweetCount();
-        tweetScore = calculateTweetScore();
+        tweetScore = 0;
         active = true;
     }
 
@@ -60,15 +60,6 @@ public class Tweet {
      */
     public Tweet() {
         super();
-    }
-
-    /**
-     * Calculate tweet score based on tweet content.
-     * 
-     * @return the int
-     */
-    private long calculateTweetScore() {
-        return ((1 + retweetCount) + text.length() + user.getUserScore());
     }
 
     /**
@@ -171,7 +162,7 @@ public class Tweet {
      * 
      * @return the tweet score
      */
-    public final long getTweetScore() {
+    public final double getTweetScore() {
         return tweetScore;
     }
 
@@ -181,7 +172,7 @@ public class Tweet {
      * @param tweetScore
      *            the new tweet score
      */
-    public final void setTweetScore(final long tweetScore) {
+    public final void setTweetScore(final double tweetScore) {
         this.tweetScore = tweetScore;
     }
 

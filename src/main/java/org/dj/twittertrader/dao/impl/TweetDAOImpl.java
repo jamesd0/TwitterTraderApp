@@ -123,7 +123,7 @@ public class TweetDAOImpl implements TweetDAO {
                 statement.setNull(DBUtils.FOUR, Types.BIGINT);
             }
             statement.setLong(DBUtils.FIVE, tweet.getRetweetCount());
-            statement.setLong(DBUtils.SIX, tweet.getTweetScore());
+            statement.setDouble(DBUtils.SIX, tweet.getTweetScore());
             statement.setBoolean(DBUtils.SEVEN, tweet.isActive());
             statement.setLong(DBUtils.EIGHT, tweet.getCreatedAt().getTime());
             statement.setString(DBUtils.NINE, tweet.getText());
@@ -133,7 +133,7 @@ public class TweetDAOImpl implements TweetDAO {
                 statement.setNull(DBUtils.TEN, Types.BIGINT);
             }
             statement.setLong(DBUtils.ELEVEN, tweet.getRetweetCount());
-            statement.setLong(DBUtils.TWELVE, tweet.getTweetScore());
+            statement.setDouble(DBUtils.TWELVE, tweet.getTweetScore());
             statement.setBoolean(DBUtils.THIRTEEN, tweet.isActive());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -157,7 +157,7 @@ public class TweetDAOImpl implements TweetDAO {
             statement.setLong(DBUtils.ONE, tweet.getCreatedAt().getTime());
             statement.setString(DBUtils.TWO, tweet.getText());
             statement.setLong(DBUtils.THREE, tweet.getRetweetCount());
-            statement.setLong(DBUtils.FOUR, tweet.getTweetScore());
+            statement.setDouble(DBUtils.FOUR, tweet.getTweetScore());
             statement.setBoolean(DBUtils.SIX, tweet.isActive());
             statement.setLong(DBUtils.SEVEN, tweet.getId());
             statement.executeUpdate();

@@ -14,6 +14,7 @@ import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.service.CompanyService;
 import org.dj.twittertrader.service.TweetService;
 import org.dj.twittertrader.service.UserService;
+import org.dj.twittertrader.swn.TweetTagger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,10 @@ import twitter4j.StatusListener;
 import twitter4j.internal.org.json.JSONException;
 
 /**
- * The listener interface for receiving twitterStatus events. The class that is
- * interested in processing a twitterStatus event implements this interface, and
- * the object created with that class is registered with a component using the
- * component's <code>addTwitterStatusListener</code> method. When the
- * twitterStatus event occurs, that object's appropriate method is invoked.
+ * The listener interface for receiving twitterStatus events. The class that is interested in
+ * processing a twitterStatus event implements this interface, and the object created with that
+ * class is registered with a component using the component's <code>addTwitterStatusListener</code>
+ * method. When the twitterStatus event occurs, that object's appropriate method is invoked.
  * 
  * @see TwitterStatusEvent
  */
@@ -59,6 +59,10 @@ public class TwitterStatusListener implements StatusListener {
     @Autowired
     private FinanceDataReceiver financeDataReceiver;
 
+    /** The tagger. */
+    @Autowired
+    private TweetTagger tagger;
+
     /**
      * @param financeDataReceiver
      *            the financeDataReceiver to set
@@ -86,8 +90,7 @@ public class TwitterStatusListener implements StatusListener {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * twitter4j.StatusListener#onDeletionNotice(twitter4j.StatusDeletionNotice)
+     * @see twitter4j.StatusListener#onDeletionNotice(twitter4j.StatusDeletionNotice)
      */
     @Override
     public final void onDeletionNotice(final StatusDeletionNotice notice) {
@@ -127,6 +130,7 @@ public class TwitterStatusListener implements StatusListener {
         }
         if (status.getUser().getLang().equals("en")) {
             Tweet tweet = new Tweet(status);
+            tweet.setTweetScore(tagger.getTweetScore(tweet));
             for (Company company : companies) {
                 for (String tag : company.getStreamTokens()) {
                     if (tweet.getText().contains(tag)) {
@@ -251,4 +255,13 @@ public class TwitterStatusListener implements StatusListener {
         this.logger = logger;
     }
 
+    /**
+     * Sets the tagger.
+     * 
+     * @param tagger
+     *            the new tagger
+     */
+    public final void setTagger(final TweetTagger tagger) {
+        this.tagger = tagger;
+    }
 }

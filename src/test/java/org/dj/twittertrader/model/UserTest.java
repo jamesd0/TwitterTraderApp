@@ -20,6 +20,8 @@ import org.junit.Test;
  */
 public class UserTest {
 
+    private static final int USER_SCORE = 20740;
+
     /** The Constant TEST_INT. */
     private static final int TEST_INT = 231231;
 
@@ -69,9 +71,7 @@ public class UserTest {
         assertEquals(user.getScreenName(), "ScreenName");
         assertEquals(user.isVerified(), true);
         assertEquals(user.isActive(), true);
-        assertEquals(user.getUserScore(),
-                (tUser.getFollowersCount() + tUser.getFriendsCount() + tUser.getFavouritesCount())
-                        * (tUser.isVerified() ? 10 : 1));
+        assertEquals(user.getUserScore(), USER_SCORE);
     }
 
     /**

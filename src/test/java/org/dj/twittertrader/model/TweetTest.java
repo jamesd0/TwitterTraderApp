@@ -19,6 +19,8 @@ import org.junit.Test;
  */
 public class TweetTest {
 
+    private static final int USER_SCORE = 20740;
+
     /** The Constant TEST_INT. */
     private static final int TEST_INT = 231231;
 
@@ -67,11 +69,7 @@ public class TweetTest {
         assertEquals(tweet.getId(), TEST_INT);
         assertEquals(tweet.getRetweetCount(), TEST_INT);
         assertEquals(tweet.getText(), "RandomText");
-        assertEquals(
-                tweet.getTweetScore(),
-                ((1 + TEST_INT) + "RandomText".length() + (tUser.getFollowersCount()
-                        + tUser.getFriendsCount() + tUser.getFavouritesCount())
-                        * (tUser.isVerified() ? 10 : 1)));
+        assertEquals(tweet.getTweetScore(), 0);
         assertEquals(tweet.getUser().getCreatedAt(), new Date(date));
         assertEquals(tweet.getUser().getFavouritesCount(), TEST_INT);
         assertEquals(tweet.getUser().getFollowersCount(), TEST_INT);
@@ -83,9 +81,7 @@ public class TweetTest {
         assertEquals(tweet.getUser().getScreenName(), "ScreenName");
         assertEquals(tweet.getUser().isVerified(), true);
         assertEquals(tweet.getUser().isActive(), true);
-        assertEquals(tweet.getUser().getUserScore(),
-                (tUser.getFollowersCount() + tUser.getFriendsCount() + tUser.getFavouritesCount())
-                        * (tUser.isVerified() ? 10 : 1));
+        assertEquals(tweet.getUser().getUserScore(), USER_SCORE);
     }
 
     // /**

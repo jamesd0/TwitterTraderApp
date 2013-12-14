@@ -1,7 +1,7 @@
 package org.dj.twittertrader.twitter;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,9 +19,12 @@ import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.service.CompanyService;
 import org.dj.twittertrader.service.TweetService;
 import org.dj.twittertrader.service.UserService;
+import org.dj.twittertrader.swn.TweetTagger;
 import org.dj.twittertrader.utils.TestUtil;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
 import twitter4j.Status;
@@ -32,6 +35,7 @@ import twitter4j.internal.org.json.JSONException;
 /**
  * The Class TwitterStatusListenerTest.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TwitterStatusListenerTest {
 
     /** The Constant FIRST. */
@@ -63,6 +67,10 @@ public class TwitterStatusListenerTest {
     /** The company second. */
     private Company companySecond;
 
+    /** The tagger. */
+    private TweetTagger tagger;
+
+    /** The finance receiver. */
     private FinanceDataReceiver financeReceiver;
 
     /**
@@ -77,6 +85,7 @@ public class TwitterStatusListenerTest {
         companyService = mock(CompanyService.class);
         financeReceiver = mock(FinanceDataReceiver.class);
         logger = mock(Logger.class);
+        tagger = mock(TweetTagger.class);
         listener.setBroker(broker);
         listener.setTweetService(tweetService);
         listener.setUserService(userService);
@@ -84,6 +93,7 @@ public class TwitterStatusListenerTest {
         listener.setLogger(logger);
         listener.setFinanceDataReceiver(financeReceiver);
         listener.setInitialiased(false);
+        listener.setTagger(tagger);
         companyFirst = TestUtil.randomCompany();
         companySecond = TestUtil.randomCompany();
     }
@@ -156,7 +166,8 @@ public class TwitterStatusListenerTest {
     @Test
     public final void testOnStatus() throws IOException, JSONException {
         when(companyService.selectAll()).thenReturn(Arrays.asList(companyFirst, companySecond));
-        when(financeReceiver.getStockPrice(anyString())).thenReturn(100.10);
+        when(financeReceiver.getStockPrice(any(String.class))).thenReturn(100.10);
+        when(tagger.getTweetScore(any(Tweet.class))).thenReturn((double) 233.21);
         Status status = mock(Status.class);
         User user = mock(User.class);
         when(status.getUser()).thenReturn(user);
@@ -174,21 +185,22 @@ public class TwitterStatusListenerTest {
         when(user.isVerified()).thenReturn(true);
         when(user.getCreatedAt()).thenReturn(new Date(123123));
         when(user.getLocation()).thenReturn("Location");
+        Tweet predictedResultTweet = new Tweet(status);
+        predictedResultTweet.setTweetScore(23321);
         companyFirst.setName("NotMatch");
         companySecond.setName("TestText");
         companySecond.setActive(true);
         listener.onStatus(status);
+
         verify(logger, times(1)).info(status.getText());
         verify(companyService, times(1)).selectAll();
         verify(userService, times(1)).create(new org.dj.twittertrader.model.User(status.getUser()));
-        verify(tweetService, times(1)).create(new org.dj.twittertrader.model.Tweet(status));
-        verify(broker, times(1)).upload(
-                Tweet.toJson(new org.dj.twittertrader.model.Tweet(status)).getBytes());
+        verify(tweetService, times(1)).create(predictedResultTweet);
+        verify(broker, times(1)).upload(Tweet.toJson(predictedResultTweet).getBytes());
         assertEquals(listener.isInitialiased(), true);
         verifyNoMoreInteractions(logger);
         verifyNoMoreInteractions(userService);
         verifyNoMoreInteractions(tweetService);
         verifyNoMoreInteractions(broker);
     }
-
 }
