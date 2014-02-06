@@ -5,10 +5,13 @@ package org.dj.twittertrader.twitter;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.dj.twittertrader.finance.FinanceDataReceiver;
 import org.dj.twittertrader.messaging.MessagingBroker;
+import org.dj.twittertrader.messaging.impl.CompanyStockPrice;
+import org.dj.twittertrader.messaging.impl.CompanyTweet;
 import org.dj.twittertrader.model.Company;
 import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.service.CompanyService;
@@ -77,6 +80,9 @@ public class TwitterStatusListener implements StatusListener {
     /** The companies. */
     private List<Company> companies;
 
+    /** The map. */
+    private HashMap<Company, Integer> map;
+
     /*
      * (non-Javadoc)
      * 
@@ -134,24 +140,25 @@ public class TwitterStatusListener implements StatusListener {
             for (Company company : companies) {
                 for (String tag : company.getStreamTokens()) {
                     if (tweet.getText().contains(tag)) {
-                        logger.info(status.getText());
                         userService.create(tweet.getUser());
                         tweetService.create(tweet);
                         companyService.addTweetToCompany(company, tweet);
                         try {
-                            companyService.addStockPrice(company,
-                                    financeDataReceiver.getStockPrice(company.getStockSymbol()),
-                                    new Date());
-                            // upload a better message to the queue...
-                            // include
-                            // text and the
-                            // company it is about and scores
-                            broker.upload(Tweet.toJson(tweet).getBytes());
+                            if ((map.get(company) % 50) == 0) {
+                                double stockPrice = financeDataReceiver.getStockPrice(company
+                                        .getStockSymbol());
+                                companyService.addStockPrice(company, stockPrice, new Date());
+                                broker.upload(CompanyStockPrice
+                                        .getBrokerMessage(new CompanyStockPrice(company, stockPrice)));
+                            }
+                            broker.upload(CompanyTweet.getBrokerMessage(new CompanyTweet(company,
+                                    tweet)));
                         } catch (IOException e) {
                             logger.error(e.getMessage());
                         } catch (JSONException e) {
                             logger.error(e.getMessage());
                         }
+                        map.put(company, map.get(company) + 1);
                     }
                 }
             }
@@ -163,6 +170,10 @@ public class TwitterStatusListener implements StatusListener {
      */
     private void init() {
         companies = companyService.selectAll();
+        map = new HashMap<Company, Integer>();
+        for (Company company : companies) {
+            map.put(company, 0);
+        }
         initialised = true;
     }
 

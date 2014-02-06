@@ -31,7 +31,7 @@ public class TweetTagger extends Tagger {
     private static final String MODEL_LOCATION = "/modelTagger.txt";
 
     /** The Constant AVERAGE_RETWEET. */
-    private static final long AVERAGE_RETWEET = 100;
+    private static final long AVERAGE_RETWEET = 1;
 
     /** The a tagger. */
     @Autowired
@@ -199,8 +199,6 @@ public class TweetTagger extends Tagger {
         for (TaggedToken token : tokens) {
             score += sentiWordNet.extract(token.token, getWordNetTag(token.tag));
         }
-        logger.info("UserScore" + tweet.getUser().getUserScore() + "RetweetCount"
-                + (tweet.getRetweetCount() + 1));
         score *= (((tweet.getRetweetCount() + 1) * (tweet.getUser().getUserScore()) + 1) / AVERAGE_RETWEET);
         return score;
     }

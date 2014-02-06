@@ -39,6 +39,7 @@ public class CompanyController {
     @ResponseBody
     public final List<Company> getAllCompanies() {
         List<Company> companies = companyService.selectAll();
+        LOGGER.info("Returned list of companies");
         return companies;
     }
 

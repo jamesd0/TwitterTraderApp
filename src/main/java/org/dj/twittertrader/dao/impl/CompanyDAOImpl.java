@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
- * The Class CompanyDAOImpl is the class that interacts with the database to
- * perform actions on the Company entity.
+ * The Class CompanyDAOImpl is the class that interacts with the database to perform actions on the
+ * Company entity.
  */
 @Repository
 public class CompanyDAOImpl implements CompanyDAO {
@@ -52,9 +52,7 @@ public class CompanyDAOImpl implements CompanyDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.dj.twittertrader.dao.CompanyDAO#delete(org.dj.twittertrader.model
-     * .Company)
+     * @see org.dj.twittertrader.dao.CompanyDAO#delete(org.dj.twittertrader.model .Company)
      */
     @Override
     public final void delete(final Company company) {
@@ -77,9 +75,7 @@ public class CompanyDAOImpl implements CompanyDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.dj.twittertrader.dao.CompanyDAO#update(org.dj.twittertrader.model
-     * .Company)
+     * @see org.dj.twittertrader.dao.CompanyDAO#update(org.dj.twittertrader.model .Company)
      */
     @Override
     public final void update(final Company company) {
@@ -108,9 +104,7 @@ public class CompanyDAOImpl implements CompanyDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.dj.twittertrader.dao.CompanyDAO#create(org.dj.twittertrader.model
-     * .Company)
+     * @see org.dj.twittertrader.dao.CompanyDAO#create(org.dj.twittertrader.model .Company)
      */
     @Override
     public final void create(final Company company) {
@@ -179,8 +173,8 @@ public class CompanyDAOImpl implements CompanyDAO {
         }
         for (Company company : list) {
             if (company != null) {
-                company.setTweets(getAllCompanyTweets(company.getId()));
-                company.setTags(getAllCompanyTags(company.getId()));
+                company.setTweets(new ArrayList<Tweet>());
+                company.setTags(new ArrayList<String>());
             }
         }
         return list;
@@ -318,8 +312,7 @@ public class CompanyDAOImpl implements CompanyDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.dj.twittertrader.dao.CompanyDAO#addTweetToCompany(org.dj.twittertrader
+     * @see org.dj.twittertrader.dao.CompanyDAO#addTweetToCompany(org.dj.twittertrader
      * .model.Company, org.dj.twittertrader.model.Tweet)
      */
     @Override
@@ -357,9 +350,8 @@ public class CompanyDAOImpl implements CompanyDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.dj.twittertrader.dao.CompanyDAO#addStockPrice(org.dj.twittertrader
-     * .model.Company, double, java.util.Date)
+     * @see org.dj.twittertrader.dao.CompanyDAO#addStockPrice(org.dj.twittertrader .model.Company,
+     * double, java.util.Date)
      */
     @Override
     public final void addStockPrice(final Company company, final double stockPrice, final Date date) {
