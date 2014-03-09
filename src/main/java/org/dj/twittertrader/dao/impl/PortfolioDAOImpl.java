@@ -185,8 +185,7 @@ public class PortfolioDAOImpl implements PortfolioDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dj.twittertrader.dao.PortfolioDAO#login(java.lang.String,
-     * java.lang.String)
+     * @see org.dj.twittertrader.dao.PortfolioDAO#login(java.lang.String, java.lang.String)
      */
     @Override
     public final Portfolio login(final String username, final String password) {
@@ -230,12 +229,12 @@ public class PortfolioDAOImpl implements PortfolioDAO {
                 + " where pc.portfolioPC=" + id
                 + ") union select nameCompany as tags from Company where"
                 + " idCompany in (select companyPK from portfolio_company "
-                + "as pc where pc.portfolioPC=" + id + ")"
+                + "as pc where pc.portfolioPC=" + id + ") and Company.activeCompany=1"
                 + " union select nameCompany as tags from Company where"
                 + " idCompany in (select companyIC from industry_company "
                 + "as ic where ic.industryIC in"
                 + " (select industryPI from portfolio_industry as pi where pi.portfolioPI=" + id
-                + "));";
+                + ")) and Company.activeCompany=1;";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
@@ -243,6 +242,47 @@ public class PortfolioDAOImpl implements PortfolioDAO {
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 tokens.add(resultSet.getString("tags"));
+            }
+        } catch (SQLException e) {
+            LOGGER.error(e.getMessage());
+        } finally {
+            DBUtils.close(resultSet);
+            DBUtils.close(statement);
+            DBUtils.close(connection);
+        }
+        tokens.addAll(getStockSymbolTags(id));
+        return tokens;
+    }
+
+    /**
+     * Gets the stock symbol tags.
+     * 
+     * @param id
+     *            the id
+     * @return the stock symbol tags
+     */
+    private List<String> getStockSymbolTags(long id) {
+        List<String> tokens = new ArrayList<String>();
+        String sql = "select stockSymbol as tags from twittertrader.Company"
+                + " where idCompany in (select companyPK from twittertrader.portfolio_company"
+                + " as pc where pc.portfolioPC = " + id + ") and Company.activeCompany = 1"
+                + " union select stockSymbol as tags from twittertrader.Company "
+                + "where idCompany in (select companyIC from twittertrader.industry_company"
+                + " as ic where ic.industryIC in "
+                + "(select industryPI from twittertrader.portfolio_industry"
+                + " as pi where pi.portfolioPI = " + id + ")) and Company.activeCompany = 1;";
+        LOGGER.info(sql);
+        try {
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(sql);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                String tag = resultSet.getString("tags");
+                if (tag.contains(".")) {
+                    tokens.add("$" + tag.split("\\.")[0]);
+                } else {
+                    tokens.add("$" + tag);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());

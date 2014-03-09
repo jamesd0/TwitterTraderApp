@@ -61,7 +61,6 @@ Checkstyle configuration that checks the sun coding conventions.
     </module>
     <module name="IllegalInstantiation"/>
     <module name="InnerAssignment"/>
-    <module name="MagicNumber"/>
     <module name="MissingSwitchDefault"/>
     <module name="RedundantThrows">
       <property name="suppressLoadErrors" value="true"/>
@@ -78,10 +77,8 @@ Checkstyle configuration that checks the sun coding conventions.
     <module name="TodoComment"/>
     <module name="UpperEll"/>
   </module>
-  <module name="JavadocPackage"/>
   <module name="NewlineAtEndOfFile"/>
   <module name="Translation"/>
-  <module name="FileLength"/>
   <module name="FileTabCharacter"/>
  
 </module>
