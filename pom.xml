@@ -168,7 +168,6 @@
 			<version>1.7.1</version>
 		</dependency>
 		<!-- Test -->
-
 		<dependency>
 			<groupId>nl.jqno.equalsverifier</groupId>
 			<artifactId>equalsverifier</artifactId>
@@ -227,6 +226,12 @@
 			<artifactId>jackson-annotations</artifactId>
 			<version>2.2.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.aliasi</groupId>
+			<artifactId>lingpipe</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		
 	</dependencies>
 	<reporting>
 		<plugins>
