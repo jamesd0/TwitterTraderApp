@@ -17,6 +17,9 @@ public class CompanyTweet {
     /** The company symbol. */
     private String companySymbol;
 
+    /** The industry. */
+    private String industry;
+
     /** The stock price. */
     private double tweetScore;
 
@@ -31,6 +34,7 @@ public class CompanyTweet {
     public CompanyTweet(final Company company, final Tweet tweet) {
         this.companySymbol = company.getStockSymbol();
         this.tweetScore = tweet.getTweetScore();
+        this.industry = company.getIndustry();
     }
 
     /**
@@ -102,6 +106,77 @@ public class CompanyTweet {
      */
     public final void setTweetScore(final double tweetScore) {
         this.tweetScore = tweetScore;
+    }
+
+    /**
+     * Gets the industry.
+     * 
+     * @return the industry
+     */
+    public final String getIndustry() {
+        return industry;
+    }
+
+    /**
+     * Sets the industry.
+     * 
+     * @param industry
+     *            the new industry
+     */
+    public final void setIndustry(final String industry) {
+        this.industry = industry;
+    }
+
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((companySymbol == null) ? 0 : companySymbol.hashCode());
+        result = prime * result + ((industry == null) ? 0 : industry.hashCode());
+        long temp;
+        temp = Double.doubleToLongBits(tweetScore);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof CompanyTweet)) {
+            return false;
+        }
+        CompanyTweet other = (CompanyTweet) obj;
+        if (companySymbol == null) {
+            if (other.companySymbol != null) {
+                return false;
+            }
+        } else if (!companySymbol.equals(other.companySymbol)) {
+            return false;
+        }
+        if (industry == null) {
+            if (other.industry != null) {
+                return false;
+            }
+        } else if (!industry.equals(other.industry)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(tweetScore) != Double.doubleToLongBits(other.tweetScore)) {
+            return false;
+        }
+        if (type == null) {
+            if (other.type != null) {
+                return false;
+            }
+        } else if (!type.equals(other.type)) {
+            return false;
+        }
+        return true;
     }
 
 }

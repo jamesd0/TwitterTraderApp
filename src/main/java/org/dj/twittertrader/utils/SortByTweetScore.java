@@ -16,7 +16,14 @@ public class SortByTweetScore implements Comparator<Tweet> {
      */
     @Override
     public final int compare(final Tweet o1, final Tweet o2) {
-        return (int) (o1.getTweetScore() - o2.getTweetScore());
+        int result = (int) (o1.getTweetScore() - o2.getTweetScore());
+        if (result > 0) {
+            return 1;
+        } else if (result < 0) {
+            return -1;
+        } else {
+            return result;
+        }
     }
 
 }

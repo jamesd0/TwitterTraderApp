@@ -4,14 +4,11 @@
 package org.dj.twittertrader.twitter;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import org.dj.twittertrader.finance.FinanceDataReceiver;
 import org.dj.twittertrader.messaging.MessagingBroker;
 import org.dj.twittertrader.messaging.impl.CompanyStockPrice;
-import org.dj.twittertrader.messaging.impl.CompanyTweet;
 import org.dj.twittertrader.model.Company;
 import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.service.CompanyService;
@@ -40,6 +37,10 @@ import twitter4j.internal.org.json.JSONException;
 @Component
 public class TwitterStatusListener implements StatusListener {
 
+    /** The Constant REFRESH_NUMBER. */
+
+    private static final int TWENTY_SECS_IN_MILLIS = 20000;
+
     /** The Constant logger. */
     private Logger logger = LoggerFactory.getLogger(TwitterStatusListener.class);
 
@@ -61,12 +62,16 @@ public class TwitterStatusListener implements StatusListener {
     /** The finance data receiver. */
     @Autowired
     private FinanceDataReceiver financeDataReceiver;
-
     /** The tagger. */
     @Autowired
     private TweetTagger tagger;
 
+    /** The last stock time. */
+    private long lastStockTime = 0;
+
     /**
+     * Sets the finance data receiver.
+     * 
      * @param financeDataReceiver
      *            the financeDataReceiver to set
      */
@@ -76,12 +81,8 @@ public class TwitterStatusListener implements StatusListener {
 
     /** The initialiased. */
     private boolean initialised = false;
-
     /** The companies. */
     private List<Company> companies;
-
-    /** The map. */
-    private HashMap<Company, Integer> map;
 
     /*
      * (non-Javadoc)
@@ -135,30 +136,42 @@ public class TwitterStatusListener implements StatusListener {
             init();
         }
         if (status.getUser().getLang().equals("en")) {
-            Tweet tweet = new Tweet(status);
-            tweet.setTweetScore(tagger.getTweetScore(tweet));
             for (Company company : companies) {
                 for (String tag : company.getStreamTokens()) {
-                    if (tweet.getText().contains(tag)) {
+                    if (status.getText().contains(tag)) {
+                        // entity identification
+                        Tweet tweet = tagger.dealWithNewStatus(status, company);
+                        // adding user to db
                         userService.create(tweet.getUser());
+                        // adding tweet to db
                         tweetService.create(tweet);
+                        // adding tweet to company db
                         companyService.addTweetToCompany(company, tweet);
                         try {
-                            if ((map.get(company) % 50) == 0) {
-                                double stockPrice = financeDataReceiver.getStockPrice(company
-                                        .getStockSymbol());
-                                companyService.addStockPrice(company, stockPrice, new Date());
-                                broker.upload(CompanyStockPrice
-                                        .getBrokerMessage(new CompanyStockPrice(company, stockPrice)));
+                            long currentTime = System.currentTimeMillis();
+                            if (lastStockTime == 0) {
+                                lastStockTime = currentTime;
                             }
-                            broker.upload(CompanyTweet.getBrokerMessage(new CompanyTweet(company,
-                                    tweet)));
+                            if (currentTime - lastStockTime > TWENTY_SECS_IN_MILLIS) {
+                                lastStockTime = currentTime;
+                                // getting stock price
+                                financeDataReceiver.updateStockPrice(companies);
+                                for (Company tempCompany : companies) {
+                                    // adding stock price to db
+                                    companyService.addStockPrice(tempCompany);
+                                    // adding stockprice to queue
+                                    broker.upload(CompanyStockPrice
+                                            .getBrokerMessageIndividual(tempCompany));
+
+                                }
+                            }
                         } catch (IOException e) {
                             logger.error(e.getMessage());
                         } catch (JSONException e) {
                             logger.error(e.getMessage());
+                        } catch (Exception e) {
+                            logger.error(e.getMessage());
                         }
-                        map.put(company, map.get(company) + 1);
                     }
                 }
             }
@@ -166,14 +179,48 @@ public class TwitterStatusListener implements StatusListener {
     }
 
     /**
+     * Gets the last stock time.
+     * 
+     * @return the last stock time
+     */
+    public long getLastStockTime() {
+        return lastStockTime;
+    }
+
+    /**
+     * Sets the last stock time.
+     * 
+     * @param lastStockTime
+     *            the new last stock time
+     */
+    public void setLastStockTime(long lastStockTime) {
+        this.lastStockTime = lastStockTime;
+    }
+
+    /**
+     * Gets the companies.
+     * 
+     * @return the companies
+     */
+    public List<Company> getCompanies() {
+        return companies;
+    }
+
+    /**
+     * Sets the companies.
+     * 
+     * @param companies
+     *            the new companies
+     */
+    public void setCompanies(final List<Company> companies) {
+        this.companies = companies;
+    }
+
+    /**
      * Inits the.
      */
     private void init() {
         companies = companyService.selectAll();
-        map = new HashMap<Company, Integer>();
-        for (Company company : companies) {
-            map.put(company, 0);
-        }
         initialised = true;
     }
 

@@ -1,7 +1,6 @@
 package org.dj.twittertrader.swn;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +44,7 @@ public class SentiWordNetTest {
     @Test
     public final void testAmazingVer() {
         Double score = sentiWordNet.extract("amazing", "v");
-        assertNull(score);
+        assertEquals(score, 0.0, DELTA);
     }
 
 }

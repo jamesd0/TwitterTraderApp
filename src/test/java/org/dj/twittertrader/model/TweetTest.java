@@ -69,7 +69,7 @@ public class TweetTest {
         assertEquals(tweet.getId(), TEST_INT);
         assertEquals(tweet.getRetweetCount(), TEST_INT);
         assertEquals(tweet.getText(), "RandomText");
-        assertEquals(tweet.getTweetScore(), 0);
+        assertEquals(tweet.getTweetScore(), 0.0, 0.0);
         assertEquals(tweet.getUser().getCreatedAt(), new Date(date));
         assertEquals(tweet.getUser().getFavouritesCount(), TEST_INT);
         assertEquals(tweet.getUser().getFollowersCount(), TEST_INT);
@@ -81,7 +81,7 @@ public class TweetTest {
         assertEquals(tweet.getUser().getScreenName(), "ScreenName");
         assertEquals(tweet.getUser().isVerified(), true);
         assertEquals(tweet.getUser().isActive(), true);
-        assertEquals(tweet.getUser().getUserScore(), USER_SCORE);
+        assertEquals(tweet.getUser().getUserScore(), USER_SCORE, 0.0);
     }
 
     // /**

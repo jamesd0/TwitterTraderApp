@@ -4,12 +4,10 @@
 package org.dj.twittertrader.utils;
 
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.TimeZone;
 
 import org.dj.twittertrader.model.Company;
 import org.dj.twittertrader.model.Industry;
@@ -17,8 +15,6 @@ import org.dj.twittertrader.model.Portfolio;
 import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.model.User;
 import org.springframework.http.MediaType;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The Class TestUtil.
@@ -30,8 +26,6 @@ public final class TestUtil {
 
     /** The Constant TEST_LIST_CEILING. */
     private static final int TEST_LIST_MAX = 10;
-    private static ObjectMapper mapper = new ObjectMapper().setDateFormat(
-            new SimpleDateFormat("HH:mm:ss,dd/MM")).setTimeZone(TimeZone.getTimeZone("GMT"));
 
     /**
      * Instantiates a new dB utils.
@@ -77,6 +71,7 @@ public final class TestUtil {
         company.setCompanyScore(new Random().nextInt(SCORE_CEILING));
         company.setTags(randomTags());
         company.setTweets(randomTweets());
+        company.setStockSymbol("hsbc.l");
         return company;
     }
 

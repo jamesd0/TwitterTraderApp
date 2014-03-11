@@ -43,9 +43,7 @@ public class TweetDAOImpl implements TweetDAO {
     public final List<Tweet> selectAll() {
         List<Tweet> list = new ArrayList<Tweet>();
         Tweet tweet;
-        User user;
-        String sql = "SELECT * FROM Tweet inner join User on Tweet.user=User.idUser"
-                + " where Tweet.activeTweet=1";
+        String sql = "SELECT * FROM Tweet";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
@@ -53,26 +51,12 @@ public class TweetDAOImpl implements TweetDAO {
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 tweet = new Tweet();
-                user = new User();
                 tweet.setId(resultSet.getLong("idTweet"));
                 tweet.setCreatedAt(new Date(resultSet.getLong("createdAtTweet")));
                 tweet.setText(resultSet.getString("text"));
                 tweet.setRetweetCount(resultSet.getLong("retweetCount"));
                 tweet.setTweetScore(resultSet.getLong("scoreTweet"));
                 tweet.setActive(resultSet.getBoolean("activeTweet"));
-                user.setId(resultSet.getLong("idUser"));
-                user.setName(resultSet.getString("nameUser"));
-                user.setScreenName(resultSet.getString("screenName"));
-                user.setFollowersCount(resultSet.getInt("followersCount"));
-                user.setFriendsCount(resultSet.getInt("friendsCount"));
-                user.setFavouritesCount(resultSet.getInt("favouritesCount"));
-                user.setVerified(resultSet.getBoolean("verified"));
-                user.setLang(resultSet.getString("lang"));
-                user.setCreatedAt(new Date(resultSet.getLong("createdAtUser")));
-                user.setLocation(resultSet.getString("locationUser"));
-                user.setUserScore(resultSet.getLong("scoreUser"));
-                user.setActive(resultSet.getBoolean("activeUser"));
-                tweet.setUser(user);
                 list.add(tweet);
             }
         } catch (SQLException e) {
@@ -82,6 +66,7 @@ public class TweetDAOImpl implements TweetDAO {
             DBUtils.close(statement);
             DBUtils.close(connection);
         }
+        LOGGER.info("Returned all tweets");
         return list;
     }
 

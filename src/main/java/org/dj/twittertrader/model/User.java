@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class User {
 
+    /** The Constant VERIFIED_MULTIPLIER. */
+    private static final int VERIFIED_MULTIPLIER = 10;
+
     /** The Constant AVERAGE_FOLLOWERS. */
     private static final int AVERAGE_FOLLOWERS = 208;
 
@@ -89,8 +92,19 @@ public class User {
      * @return the int
      */
     private double calculateUserScore() {
-        return ((followersCount / AVERAGE_FOLLOWERS) + (friendsCount / AVERAGE_FRIENDS) + (favouritesCount / AVERAGE_FAVOURITES))
-                * (verified ? 10 : 1);
+        double score = 1;
+        if (verified) {
+            score = Math.log((followersCount / AVERAGE_FOLLOWERS)
+                    + (friendsCount / AVERAGE_FRIENDS) + (favouritesCount / AVERAGE_FAVOURITES)
+                    * VERIFIED_MULTIPLIER);
+        } else {
+            score = Math.log((followersCount / AVERAGE_FOLLOWERS)
+                    + (friendsCount / AVERAGE_FRIENDS) + (favouritesCount / AVERAGE_FAVOURITES));
+        }
+        if (score < 1) {
+            score = 1;
+        }
+        return score;
     }
 
     /**
@@ -347,11 +361,6 @@ public class User {
         return new ObjectMapper().writeValueAsString(user);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public final int hashCode() {
         final int prime = 31;
@@ -366,16 +375,13 @@ public class User {
         result = prime * result + ((location == null) ? 0 : location.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((screenName == null) ? 0 : screenName.hashCode());
-        result = (int) (prime * result + userScore);
+        long temp;
+        temp = Double.doubleToLongBits(userScore);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
         result = prime * result + (verified ? 1231 : 1237);
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public final boolean equals(final Object obj) {
         if (this == obj) {
@@ -438,7 +444,7 @@ public class User {
         } else if (!screenName.equals(other.screenName)) {
             return false;
         }
-        if (userScore != other.userScore) {
+        if (Double.doubleToLongBits(userScore) != Double.doubleToLongBits(other.userScore)) {
             return false;
         }
         if (verified != other.verified) {

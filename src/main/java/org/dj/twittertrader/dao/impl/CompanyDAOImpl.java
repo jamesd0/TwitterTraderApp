@@ -354,15 +354,15 @@ public class CompanyDAOImpl implements CompanyDAO {
      * double, java.util.Date)
      */
     @Override
-    public final void addStockPrice(final Company company, final double stockPrice, final Date date) {
+    public final void addStockPrice(final Company company) {
         String sql = "insert into StockPrice (company, date, price) values (?, ?, ?)";
         LOGGER.info(sql);
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(sql);
             statement.setLong(DBUtils.ONE, company.getId());
-            statement.setLong(DBUtils.TWO, date.getTime());
-            statement.setDouble(DBUtils.THREE, stockPrice);
+            statement.setLong(DBUtils.TWO, new Date().getTime());
+            statement.setDouble(DBUtils.THREE, company.getStockPrice());
             statement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error(e.getMessage());

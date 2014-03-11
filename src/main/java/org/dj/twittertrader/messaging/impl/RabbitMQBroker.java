@@ -18,7 +18,7 @@ import com.rabbitmq.client.ConnectionFactory;
 public class RabbitMQBroker implements MessagingBroker {
 
     /** The Constant logger. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQBroker.class);
+    private Logger logger = LoggerFactory.getLogger(RabbitMQBroker.class);
 
     /** The Constant QUEUE_NAME. */
     private static final String QUEUE_NAME = "twitter.trader";
@@ -45,28 +45,32 @@ public class RabbitMQBroker implements MessagingBroker {
      * @see org.dj.twittertrader.messaging.MessagingBroker#upload(byte[])
      */
     @Override
-    public final void upload(final byte[] message) {
+    public final void upload(final byte[] message) throws IOException {
         if (!initialised) {
             this.init();
         }
         try {
-            LOGGER.info("Uploaded message: " + new String(message, "UTF-8") + " to queue: "
+            logger.info("Uploading message: " + new String(message, "UTF-8") + " to queue: "
                     + QUEUE_NAME);
             channel.basicPublish(EXCHANGE_NAME, ROUTING_KEY, null, message);
         } catch (IOException e) {
-            LOGGER.debug(e.getMessage());
+            logger.error(e.getMessage());
         }
 
     }
 
     /**
      * Initialises the channel.
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
-    private void init() {
+    private void init() throws IOException {
         try {
             channel = factory.newConnection().createChannel();
         } catch (IOException e) {
-            LOGGER.debug(e.getMessage());
+            logger.error(e.getMessage());
+            throw e;
         }
         initialised = true;
 
@@ -109,6 +113,17 @@ public class RabbitMQBroker implements MessagingBroker {
      */
     public final void setChannel(final Channel channel2) {
         this.channel = channel2;
+
+    }
+
+    /**
+     * Sets the logger.
+     * 
+     * @param logger
+     *            the new logger
+     */
+    public final void setLogger(final Logger logger) {
+        this.logger = logger;
 
     }
 }

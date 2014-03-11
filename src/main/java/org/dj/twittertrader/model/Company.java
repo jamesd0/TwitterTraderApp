@@ -36,8 +36,8 @@ public class Company {
     private String industry;
 
     /**
-     * The tags. A tag is a word that is associated with the company example for
-     * CocaCola coke would be a tag
+     * The tags. A tag is a word that is associated with the company example for CocaCola coke would
+     * be a tag
      */
     private List<String> tags;
 
@@ -174,7 +174,7 @@ public class Company {
      * 
      * @return the stock price
      */
-    public final double getStockPrice() {
+    public double getStockPrice() {
         return stockPrice;
     }
 
@@ -189,6 +189,8 @@ public class Company {
     }
 
     /**
+     * Gets the tags.
+     * 
      * @return the tags
      */
     public final List<String> getTags() {
@@ -210,7 +212,7 @@ public class Company {
      * 
      * @return the company score
      */
-    public final long getCompanyScore() {
+    public long getCompanyScore() {
         return companyScore;
     }
 
@@ -244,6 +246,8 @@ public class Company {
     }
 
     /**
+     * Gets the latest tweets.
+     * 
      * @return the latestTweets
      */
     public final List<Tweet> getLatestTweets() {
@@ -251,6 +255,8 @@ public class Company {
     }
 
     /**
+     * Gets the most influential tweets.
+     * 
      * @return the mostInfluentialTweets
      */
     public final List<Tweet> getMostInfluentialTweets() {
@@ -271,7 +277,20 @@ public class Company {
      * 
      * @return the stock symbol
      */
-    public final String getStockSymbol() {
+    public String getStockSymbol() {
+        if (stockSymbol.contains(".")) {
+            return stockSymbol.split("\\.")[0];
+        } else {
+            return stockSymbol;
+        }
+    }
+
+    /**
+     * Gets the stock symbol not abreviated.
+     * 
+     * @return the stock symbol not abreviated
+     */
+    public final String getStockSymbolNotAbreviated() {
         return stockSymbol;
     }
 
@@ -285,18 +304,40 @@ public class Company {
         this.stockSymbol = stockSymbol;
     }
 
+    /**
+     * Gets the stock currency.
+     * 
+     * @return the stock currency
+     */
     public String getStockCurrency() {
         return stockCurrency;
     }
 
+    /**
+     * Sets the stock currency.
+     * 
+     * @param stockCurrency
+     *            the new stock currency
+     */
     public void setStockCurrency(String stockCurrency) {
         this.stockCurrency = stockCurrency;
     }
 
+    /**
+     * Gets the industry.
+     * 
+     * @return the industry
+     */
     public String getIndustry() {
         return industry;
     }
 
+    /**
+     * Sets the industry.
+     * 
+     * @param industry
+     *            the new industry
+     */
     public void setIndustry(String industry) {
         this.industry = industry;
     }
@@ -327,35 +368,57 @@ public class Company {
         return new ObjectMapper().writeValueAsString(company);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Gets the stream tokens.
      * 
-     * @see java.lang.Object#hashCode()
+     * @return the stream tokens
      */
+    public List<String> getStreamTokens() {
+        List<String> list = new ArrayList<String>();
+        if (isActive()) {
+            list.add(getName());
+            for (String tag : getTags()) {
+                list.add(tag);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Calculate score.
+     * 
+     * @return the long
+     */
+    public final long calculateScore() {
+        long score = 0;
+        for (Tweet tweet : getTweets()) {
+            score += tweet.getTweetScore();
+        }
+        return score;
+    }
+
     @Override
     public final int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (active ? 1231 : 1237);
-        result = (int) (prime * result + companyScore);
+        result = prime * result + (int) (companyScore ^ (companyScore >>> 32));
         result = prime * result + ((description == null) ? 0 : description.hashCode());
         result = prime * result + (int) (id ^ (id >>> 32));
+        result = prime * result + ((industry == null) ? 0 : industry.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((stockCurrency == null) ? 0 : stockCurrency.hashCode());
         long temp;
         temp = Double.doubleToLongBits(stockPrice);
         result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + ((stockSymbol == null) ? 0 : stockSymbol.hashCode());
         result = prime * result + ((tags == null) ? 0 : tags.hashCode());
         result = prime * result + ((tweets == null) ? 0 : tweets.hashCode());
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public final boolean equals(final Object obj) {
+    public final boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -382,6 +445,13 @@ public class Company {
         if (id != other.id) {
             return false;
         }
+        if (industry == null) {
+            if (other.industry != null) {
+                return false;
+            }
+        } else if (!industry.equals(other.industry)) {
+            return false;
+        }
         if (name == null) {
             if (other.name != null) {
                 return false;
@@ -389,7 +459,21 @@ public class Company {
         } else if (!name.equals(other.name)) {
             return false;
         }
+        if (stockCurrency == null) {
+            if (other.stockCurrency != null) {
+                return false;
+            }
+        } else if (!stockCurrency.equals(other.stockCurrency)) {
+            return false;
+        }
         if (Double.doubleToLongBits(stockPrice) != Double.doubleToLongBits(other.stockPrice)) {
+            return false;
+        }
+        if (stockSymbol == null) {
+            if (other.stockSymbol != null) {
+                return false;
+            }
+        } else if (!stockSymbol.equals(other.stockSymbol)) {
             return false;
         }
         if (tags == null) {
@@ -407,35 +491,6 @@ public class Company {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Gets the stream tokens.
-     * 
-     * @return the stream tokens
-     */
-    public final List<String> getStreamTokens() {
-        List<String> list = new ArrayList<String>();
-        if (isActive()) {
-            list.add(getName());
-            for (String tag : getTags()) {
-                list.add(tag);
-            }
-        }
-        return list;
-    }
-
-    /**
-     * Calculate score.
-     * 
-     * @return the long
-     */
-    public final long calculateScore() {
-        long score = 0;
-        for (Tweet tweet : getTweets()) {
-            score += tweet.getTweetScore();
-        }
-        return score;
     }
 
 }

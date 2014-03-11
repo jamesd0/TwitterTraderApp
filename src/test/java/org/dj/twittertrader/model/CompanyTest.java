@@ -1,7 +1,9 @@
 package org.dj.twittertrader.model;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.List;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -27,17 +29,17 @@ public class CompanyTest {
         company = TestUtil.randomCompany();
     }
 
-    // /**
-    // * Test json.
-    // *
-    // * @throws IOException
-    // * Signals that an I/O exception has occurred.
-    // */
-    // @Test
-    // public final void testJson() throws IOException {
-    // String json = Company.toJson(company);
-    // assertEquals(company, Company.fromJson(json));
-    // }
+    /**
+     * Test json.
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
+    @Test
+    public final void testJson() throws IOException {
+        String test = "http://www.facebook.com";
+        assertTrue(test.contains("://"));
+    }
 
     /**
      * Test get stream tokens.
@@ -49,6 +51,24 @@ public class CompanyTest {
             assertTrue(tokens.containsAll(company.getTags()));
             assertTrue(tokens.contains(company.getName()));
         }
+    }
+
+    /**
+     * Should return left side when symbol contains fullstop.
+     */
+    @Test
+    public final void shouldReturnLeftSideWhenSymbolContainsFullstop() {
+        company.setStockSymbol("test.symbol");
+        assertEquals(company.getStockSymbol(), "test");
+    }
+
+    /**
+     * Should return a ll when symbol does not contain fullstop.
+     */
+    @Test
+    public final void shouldReturnAllWhenSymbolDoesNotContainFullstop() {
+        company.setStockSymbol("testsymbol");
+        assertEquals(company.getStockSymbol(), "testsymbol");
     }
 
     /**

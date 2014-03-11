@@ -124,7 +124,7 @@ public class Tweet {
      * 
      * @return the user
      */
-    public final User getUser() {
+    public User getUser() {
         return user;
     }
 
@@ -221,78 +221,6 @@ public class Tweet {
         return new ObjectMapper().writeValueAsString(tweet);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public final int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (active ? 1231 : 1237);
-        result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + (int) (retweetCount ^ (retweetCount >>> 32));
-        result = prime * result + ((text == null) ? 0 : text.hashCode());
-        result = (int) (prime * result + tweetScore);
-        result = prime * result + ((user == null) ? 0 : user.hashCode());
-        return result;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public final boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Tweet)) {
-            return false;
-        }
-        Tweet other = (Tweet) obj;
-        if (active != other.active) {
-            return false;
-        }
-        if (createdAt == null) {
-            if (other.createdAt != null) {
-                return false;
-            }
-        } else if (!createdAt.equals(other.createdAt)) {
-            return false;
-        }
-        if (id != other.id) {
-            return false;
-        }
-        if (retweetCount != other.retweetCount) {
-            return false;
-        }
-        if (text == null) {
-            if (other.text != null) {
-                return false;
-            }
-        } else if (!text.equals(other.text)) {
-            return false;
-        }
-        if (tweetScore != other.tweetScore) {
-            return false;
-        }
-        if (user == null) {
-            if (other.user != null) {
-                return false;
-            }
-        } else if (!user.equals(other.user)) {
-            return false;
-        }
-        return true;
-    }
-
     /**
      * Gets the latest tweets.
      * 
@@ -363,5 +291,69 @@ public class Tweet {
             }
         }
         return list;
+    }
+
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (active ? 1231 : 1237);
+        result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
+        result = prime * result + (int) (id ^ (id >>> 32));
+        result = prime * result + (int) (retweetCount ^ (retweetCount >>> 32));
+        result = prime * result + ((text == null) ? 0 : text.hashCode());
+        long temp;
+        temp = Double.doubleToLongBits(tweetScore);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        result = prime * result + ((user == null) ? 0 : user.hashCode());
+        return result;
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Tweet)) {
+            return false;
+        }
+        Tweet other = (Tweet) obj;
+        if (active != other.active) {
+            return false;
+        }
+        if (createdAt == null) {
+            if (other.createdAt != null) {
+                return false;
+            }
+        } else if (!createdAt.equals(other.createdAt)) {
+            return false;
+        }
+        if (id != other.id) {
+            return false;
+        }
+        if (retweetCount != other.retweetCount) {
+            return false;
+        }
+        if (text == null) {
+            if (other.text != null) {
+                return false;
+            }
+        } else if (!text.equals(other.text)) {
+            return false;
+        }
+        if (Double.doubleToLongBits(tweetScore) != Double.doubleToLongBits(other.tweetScore)) {
+            return false;
+        }
+        if (user == null) {
+            if (other.user != null) {
+                return false;
+            }
+        } else if (!user.equals(other.user)) {
+            return false;
+        }
+        return true;
     }
 }

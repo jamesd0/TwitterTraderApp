@@ -1,26 +1,23 @@
 package org.dj.twittertrader.twitter;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 
 import org.dj.twittertrader.finance.FinanceDataReceiver;
 import org.dj.twittertrader.messaging.MessagingBroker;
+import org.dj.twittertrader.messaging.impl.CompanyStockPrice;
 import org.dj.twittertrader.model.Company;
 import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.service.CompanyService;
 import org.dj.twittertrader.service.TweetService;
 import org.dj.twittertrader.service.UserService;
 import org.dj.twittertrader.swn.TweetTagger;
-import org.dj.twittertrader.utils.TestUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +27,6 @@ import org.slf4j.Logger;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.User;
-import twitter4j.internal.org.json.JSONException;
 
 /**
  * The Class TwitterStatusListenerTest.
@@ -61,11 +57,11 @@ public class TwitterStatusListenerTest {
     /** The logger. */
     private Logger logger;
 
-    /** The company first. */
-    private Company companyFirst;
+    /** The google. */
+    private Company company1;
 
-    /** The company second. */
-    private Company companySecond;
+    /** The company apple. */
+    private Company company2;
 
     /** The tagger. */
     private TweetTagger tagger;
@@ -94,8 +90,8 @@ public class TwitterStatusListenerTest {
         listener.setFinanceDataReceiver(financeReceiver);
         listener.setInitialiased(false);
         listener.setTagger(tagger);
-        companyFirst = TestUtil.randomCompany();
-        companySecond = TestUtil.randomCompany();
+        company1 = mock(Company.class);
+        company2 = mock(Company.class);
     }
 
     /**
@@ -142,7 +138,7 @@ public class TwitterStatusListenerTest {
      */
     @Test
     public final void testOnStatusNotEN() {
-        when(companyService.selectAll()).thenReturn(Arrays.asList(companyFirst, companySecond));
+        when(companyService.selectAll()).thenReturn(Arrays.asList(company1, company2));
         Status status = mock(Status.class);
         User user = mock(User.class);
         when(status.getUser()).thenReturn(user);
@@ -159,48 +155,82 @@ public class TwitterStatusListenerTest {
     /**
      * Test on status.
      * 
-     * @throws IOException
-     *             Signals that an I/O exception has occurred.
-     * @throws JSONException
+     * @throws Exception
+     *             the exception
      */
     @Test
-    public final void testOnStatus() throws IOException, JSONException {
-        when(companyService.selectAll()).thenReturn(Arrays.asList(companyFirst, companySecond));
-        when(financeReceiver.getStockPrice(any(String.class))).thenReturn(100.10);
-        when(tagger.getTweetScore(any(Tweet.class))).thenReturn((double) 233.21);
-        Status status = mock(Status.class);
+    public final void testOnStatusNoStockLookup() throws Exception {
         User user = mock(User.class);
+        Status status = mock(Status.class);
+        Company google = mock(Company.class);
+        Company apple = mock(Company.class);
+        Tweet tweet = mock(Tweet.class);
+        org.dj.twittertrader.model.User trUser = mock(org.dj.twittertrader.model.User.class);
+
+        listener.setInitialiased(true);
+        listener.setCompanies(Arrays.asList(google, apple));
+
         when(status.getUser()).thenReturn(user);
-        when(status.getId()).thenReturn((long) 21231);
-        when(status.getCreatedAt()).thenReturn(new Date(123123));
-        when(status.getText()).thenReturn("TestText");
         when(user.getLang()).thenReturn("en");
-        when(status.getRetweetCount()).thenReturn(1234123);
-        when(user.getFollowersCount()).thenReturn(123);
-        when(user.getFriendsCount()).thenReturn(12312);
-        when(user.getId()).thenReturn((long) 123123);
-        when(user.getName()).thenReturn("Name");
-        when(user.getScreenName()).thenReturn("ScreenName");
-        when(user.getFavouritesCount()).thenReturn(12);
-        when(user.isVerified()).thenReturn(true);
-        when(user.getCreatedAt()).thenReturn(new Date(123123));
-        when(user.getLocation()).thenReturn("Location");
-        Tweet predictedResultTweet = new Tweet(status);
-        predictedResultTweet.setTweetScore(23321);
-        companyFirst.setName("NotMatch");
-        companySecond.setName("TestText");
-        companySecond.setActive(true);
+        when(google.getStreamTokens()).thenReturn(Arrays.asList("$goog", "Google"));
+        when(apple.getStreamTokens()).thenReturn(Arrays.asList("$appl", "Apple"));
+        when(tagger.dealWithNewStatus(status, apple)).thenReturn(tweet);
+        when(status.getText()).thenReturn("Apple");
+        when(tweet.getUser()).thenReturn(trUser);
+
         listener.onStatus(status);
 
-        verify(logger, times(1)).info(status.getText());
-        verify(companyService, times(1)).selectAll();
-        verify(userService, times(1)).create(new org.dj.twittertrader.model.User(status.getUser()));
-        verify(tweetService, times(1)).create(predictedResultTweet);
-        verify(broker, times(1)).upload(Tweet.toJson(predictedResultTweet).getBytes());
-        assertEquals(listener.isInitialiased(), true);
-        verifyNoMoreInteractions(logger);
-        verifyNoMoreInteractions(userService);
-        verifyNoMoreInteractions(tweetService);
-        verifyNoMoreInteractions(broker);
+        verify(tagger, times(1)).dealWithNewStatus(status, company2);
+        verify(userService, times(1)).create(trUser);
+        verify(tweetService, times(1)).create(tweet);
+        verify(companyService, times(1)).addTweetToCompany(apple, tweet);
+    }
+
+    /**
+     * Test on status with stock lookup.
+     * 
+     * @throws Exception
+     *             the exception
+     */
+    @Test
+    public final void testOnStatusWithStockLookup() throws Exception {
+        User user = mock(User.class);
+        Status status = mock(Status.class);
+        Company google = mock(Company.class);
+        Company apple = mock(Company.class);
+        Tweet tweet = mock(Tweet.class);
+        org.dj.twittertrader.model.User trUser = mock(org.dj.twittertrader.model.User.class);
+
+        listener.setInitialiased(true);
+        listener.setCompanies(Arrays.asList(google, apple));
+        listener.setLastStockTime(System.currentTimeMillis() - 30000);
+
+        when(status.getUser()).thenReturn(user);
+        when(user.getLang()).thenReturn("en");
+        when(google.getStreamTokens()).thenReturn(Arrays.asList("$goog", "Google"));
+        when(google.getStockSymbol()).thenReturn("goog");
+        when(google.getStockPrice()).thenReturn(101.10);
+        when(google.getIndustry()).thenReturn("tech");
+        when(apple.getStreamTokens()).thenReturn(Arrays.asList("$appl", "Apple"));
+        when(apple.getStockSymbol()).thenReturn("aapl");
+        when(apple.getStockPrice()).thenReturn(1022.10);
+        when(apple.getIndustry()).thenReturn("tech");
+        when(tagger.dealWithNewStatus(status, apple)).thenReturn(tweet);
+        when(status.getText()).thenReturn("Apple");
+        when(tweet.getUser()).thenReturn(trUser);
+
+        listener.onStatus(status);
+
+        verify(tagger, times(1)).dealWithNewStatus(status, company2);
+        verify(userService, times(1)).create(trUser);
+        verify(tweetService, times(1)).create(tweet);
+        verify(companyService, times(1)).addTweetToCompany(apple, tweet);
+        verify(financeReceiver, times(1)).updateStockPrice(Arrays.asList(google, apple));
+
+        verify(companyService, times(2)).addStockPrice(google);
+        // verify(companyService, times(1)).addStockPrice(apple);
+
+        verify(broker, times(1)).upload(CompanyStockPrice.getBrokerMessageIndividual(google));
+        verify(broker, times(1)).upload(CompanyStockPrice.getBrokerMessageIndividual(apple));
     }
 }

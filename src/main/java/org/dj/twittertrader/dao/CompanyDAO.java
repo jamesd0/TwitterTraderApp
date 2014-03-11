@@ -1,6 +1,5 @@
 package org.dj.twittertrader.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -12,8 +11,7 @@ import org.dj.twittertrader.model.Tweet;
 import org.dj.twittertrader.service.TweetService;
 
 /**
- * This interface is the DAO for the Company entity. It provides an abstraction
- * layer to a database
+ * This interface is the DAO for the Company entity. It provides an abstraction layer to a database
  * 
  * @author duncan
  */
@@ -85,18 +83,6 @@ public interface CompanyDAO {
     void setTweetService(TweetService tweetService);
 
     /**
-     * Adds the stock price.
-     * 
-     * @param company
-     *            the company
-     * @param stockPrice
-     *            the stock price
-     * @param date
-     *            the date
-     */
-    void addStockPrice(Company company, double stockPrice, Date date);
-
-    /**
      * Populate portfolio companies.
      * 
      * @param portfolio
@@ -111,5 +97,13 @@ public interface CompanyDAO {
      *            the industry
      */
     void populateIndustryCompanies(Industry industry);
+
+    /**
+     * Adds the stock price.
+     * 
+     * @param company
+     *            the company
+     */
+    void addStockPrice(Company company);
 
 }

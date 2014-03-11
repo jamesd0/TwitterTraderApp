@@ -1,6 +1,5 @@
 package org.dj.twittertrader.service.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.dj.twittertrader.dao.CompanyDAO;
@@ -48,8 +47,7 @@ public class CompanyServiceImpl implements CompanyService {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dj.twittertrader.service.CompanyService#create
-     * (org.dj.twittertrader.model.Company)
+     * @see org.dj.twittertrader.service.CompanyService#create (org.dj.twittertrader.model.Company)
      */
     @Override
     @Transactional
@@ -61,9 +59,7 @@ public class CompanyServiceImpl implements CompanyService {
     /*
      * (non-Javadoc)
      * 
-     * @see
-     * org.dj.twittertrader.service.CompanyService#update(org.dj.twittertrader
-     * .model.Company)
+     * @see org.dj.twittertrader.service.CompanyService#update(org.dj.twittertrader .model.Company)
      */
     @Override
     @Transactional
@@ -75,8 +71,7 @@ public class CompanyServiceImpl implements CompanyService {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dj.twittertrader.service.CompanyService#delete
-     * (org.dj.twittertrader.model.Company)
+     * @see org.dj.twittertrader.service.CompanyService#delete (org.dj.twittertrader.model.Company)
      */
     @Override
     @Transactional
@@ -113,8 +108,8 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional
-    public final void addStockPrice(final Company company, final double stockPrice, final Date date) {
-        companyDAO.addStockPrice(company, stockPrice, date);
+    public final void addStockPrice(final Company company) {
+        companyDAO.addStockPrice(company);
 
     }
 

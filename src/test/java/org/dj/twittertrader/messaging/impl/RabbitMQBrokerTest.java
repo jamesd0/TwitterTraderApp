@@ -1,6 +1,7 @@
 package org.dj.twittertrader.messaging.impl;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,6 +12,7 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -20,6 +22,9 @@ import com.rabbitmq.client.ConnectionFactory;
  * The Class RabbitMQBrokerTest.
  */
 public class RabbitMQBrokerTest {
+
+    /** The logger. */
+    private Logger logger;
 
     /** The Constant EXCHANGE_NAME. */
     private static final String EXCHANGE_NAME = "twittertrader-exchange";
@@ -52,6 +57,8 @@ public class RabbitMQBrokerTest {
         connection = mock(Connection.class);
         channel = mock(Channel.class);
         broker.setFactory(factory);
+        logger = mock(Logger.class);
+        broker.setLogger(logger);
         when(factory.newConnection()).thenReturn(connection);
         when(connection.createChannel()).thenReturn(channel);
     }
@@ -116,5 +123,44 @@ public class RabbitMQBrokerTest {
         verifyNoMoreInteractions(channel);
         verifyNoMoreInteractions(connection);
         verifyNoMoreInteractions(factory);
+    }
+
+    /**
+     * Should see exception on init.
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
+    @Test
+    public final void shouldSeeExceptionOnInit() throws IOException {
+        when(connection.createChannel()).thenThrow(new IOException("Test Message"));
+        broker.setInitialised(false);
+        try {
+            broker.upload("This is a test message".getBytes());
+        } catch (IOException exception) {
+            assertEquals("Test Message", exception.getMessage());
+        }
+
+        verify(logger, times(1)).error("Test Message");
+        assertEquals(false, broker.isInitialised());
+    }
+
+    /**
+     * Should see exception on upload.
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
+    @Test
+    public final void shouldSeeExceptionOnUpload() throws IOException {
+        doThrow(new IOException("Test Message")).when(channel).basicPublish(EXCHANGE_NAME,
+                ROUTING_KEY, null, "This is a test message".getBytes());
+        broker.setInitialised(true);
+        broker.setChannel(channel);
+        broker.upload("This is a test message".getBytes());
+        verify(logger, times(1)).info(
+                "Uploading message: This is a test message to queue: twitter.trader");
+        verify(logger, times(1)).error("Test Message");
+        assertEquals(true, broker.isInitialised());
     }
 }
