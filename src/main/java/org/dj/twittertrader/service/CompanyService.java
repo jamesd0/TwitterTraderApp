@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.dj.twittertrader.dao.CompanyDAO;
 import org.dj.twittertrader.model.Company;
-import org.dj.twittertrader.model.Industry;
-import org.dj.twittertrader.model.Portfolio;
 import org.dj.twittertrader.model.Tweet;
 
 /**
@@ -30,30 +28,6 @@ public interface CompanyService {
     Company select(long id);
 
     /**
-     * Creates a company in the database.
-     * 
-     * @param company
-     *            the company
-     */
-    void create(Company company);
-
-    /**
-     * Deletes the company from the database.
-     * 
-     * @param company
-     *            the company
-     */
-    void delete(Company company);
-
-    /**
-     * Updates the company in the database.
-     * 
-     * @param company
-     *            the company
-     */
-    void update(Company company);
-
-    /**
      * Sets the company dao.
      * 
      * @param companyDAO
@@ -70,22 +44,6 @@ public interface CompanyService {
      *            the tweet
      */
     void addTweetToCompany(Company company, Tweet tweet);
-
-    /**
-     * Populate portfolio companies.
-     * 
-     * @param portfolio
-     *            the portfolio
-     */
-    void populatePortfolioCompanies(Portfolio portfolio);
-
-    /**
-     * Populate industry companies.
-     * 
-     * @param industry
-     *            the industry
-     */
-    void populateIndustryCompanies(Industry industry);
 
     /**
      * Adds the stock price.

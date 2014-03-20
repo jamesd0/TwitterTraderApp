@@ -10,11 +10,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.dj.twittertrader.dao.PortfolioDAO;
-import org.dj.twittertrader.model.Company;
-import org.dj.twittertrader.model.Industry;
-import org.dj.twittertrader.model.Portfolio;
 import org.dj.twittertrader.service.CompanyService;
-import org.dj.twittertrader.service.IndustryService;
 import org.dj.twittertrader.utils.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +33,6 @@ public class PortfolioDAOImpl implements PortfolioDAO {
     @Autowired
     private CompanyService companyService;
 
-    /** The industry service. */
-    @Autowired
-    private IndustryService industryService;
     /** The connection. */
     private Connection connection;
 
@@ -48,178 +41,6 @@ public class PortfolioDAOImpl implements PortfolioDAO {
 
     /** The statement. */
     private PreparedStatement statement;
-
-    @Override
-    public final List<Portfolio> selectAll() {
-        List<Portfolio> list = new ArrayList<Portfolio>();
-        String sql = "SELECT * FROM Portfolio where activePortfolio=1";
-        LOGGER.info(sql);
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.prepareStatement(sql);
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Portfolio portfolio = new Portfolio();
-                portfolio.setId(resultSet.getLong("idPortfolio"));
-                portfolio.setOwner(resultSet.getString("owner"));
-                portfolio.setUsername(resultSet.getString("usernamePortfolio"));
-                portfolio.setPassword(resultSet.getString("password"));
-                portfolio.setCompanies(new ArrayList<Company>());
-                portfolio.setIndustries(new ArrayList<Industry>());
-                portfolio.setActive(resultSet.getBoolean("activePortfolio"));
-                list.add(portfolio);
-            }
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
-        } finally {
-            DBUtils.close(resultSet);
-            DBUtils.close(statement);
-            DBUtils.close(connection);
-        }
-        for (Portfolio portfolio : list) {
-            companyService.populatePortfolioCompanies(portfolio);
-            industryService.populatePortfolioIndustries(portfolio);
-        }
-        return list;
-    }
-
-    @Override
-    public final void delete(final Portfolio portfolio) {
-        String sql = "update Portfolio set activePortfolio=0"
-                + " where idPortfolio=? AND activePortfolio=1";
-        LOGGER.info(sql);
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.prepareStatement(sql);
-            statement.setLong(DBUtils.ONE, portfolio.getId());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
-        } finally {
-            DBUtils.close(resultSet);
-            DBUtils.close(statement);
-            DBUtils.close(connection);
-        }
-
-    }
-
-    @Override
-    public final void create(final Portfolio portfolio) {
-        String sql = "insert into Portfolio (owner, usernamePortfolio,"
-                + " password, activePortfolio) values (?, ?, ?, ?)";
-        LOGGER.info(sql);
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.prepareStatement(sql);
-            statement.setString(DBUtils.ONE, portfolio.getOwner());
-            statement.setString(DBUtils.TWO, portfolio.getUsername());
-            statement.setString(DBUtils.THREE, portfolio.getPassword());
-            statement.setBoolean(DBUtils.SEVEN, portfolio.isActive());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
-        } finally {
-            DBUtils.close(resultSet);
-            DBUtils.close(statement);
-            DBUtils.close(connection);
-        }
-
-    }
-
-    @Override
-    public final void update(final Portfolio portfolio) {
-        String sql = "updatePortfolio set owner, usernamePortfolio=?,"
-                + " password=?, activePortfolio=? where idPortfolio=?";
-        LOGGER.info(sql);
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.prepareStatement(sql);
-            statement.setString(DBUtils.ONE, portfolio.getOwner());
-            statement.setString(DBUtils.TWO, portfolio.getUsername());
-            statement.setString(DBUtils.THREE, portfolio.getPassword());
-            statement.setBoolean(DBUtils.SEVEN, portfolio.isActive());
-            statement.setLong(DBUtils.SEVEN, portfolio.getId());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
-        } finally {
-            DBUtils.close(resultSet);
-            DBUtils.close(statement);
-            DBUtils.close(connection);
-        }
-
-    }
-
-    @Override
-    public final Portfolio select(final long id) {
-        Portfolio portfolio = null;
-        String sql = "SELECT * FROM Portfolio where idPortfolio=?";
-        LOGGER.info(sql);
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.prepareStatement(sql);
-            statement.setLong(DBUtils.ONE, id);
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                portfolio = new Portfolio();
-                portfolio.setId(resultSet.getLong("idPortfolio"));
-                portfolio.setOwner(resultSet.getString("owner"));
-                portfolio.setUsername(resultSet.getString("usernamePortfolio"));
-                portfolio.setPassword(resultSet.getString("password"));
-                portfolio.setCompanies(new ArrayList<Company>());
-                portfolio.setIndustries(new ArrayList<Industry>());
-                portfolio.setActive(resultSet.getBoolean("activePortfolio"));
-            }
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
-        } finally {
-            DBUtils.close(resultSet);
-            DBUtils.close(statement);
-            DBUtils.close(connection);
-        }
-        companyService.populatePortfolioCompanies(portfolio);
-        industryService.populatePortfolioIndustries(portfolio);
-        return portfolio;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.dj.twittertrader.dao.PortfolioDAO#login(java.lang.String, java.lang.String)
-     */
-    @Override
-    public final Portfolio login(final String username, final String password) {
-        Portfolio portfolio = null;
-        String sql = "SELECT * FROM Portfolio where usernamePortfolio=? AND password=?";
-        LOGGER.info(sql);
-        try {
-            connection = dataSource.getConnection();
-            statement = connection.prepareStatement(sql);
-            statement.setString(DBUtils.ONE, username);
-            statement.setString(DBUtils.TWO, password);
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                portfolio = new Portfolio();
-                portfolio.setId(resultSet.getLong("idPortfolio"));
-                portfolio.setOwner(resultSet.getString("owner"));
-                portfolio.setUsername(resultSet.getString("usernamePortfolio"));
-                portfolio.setPassword(resultSet.getString("password"));
-                portfolio.setCompanies(new ArrayList<Company>());
-                portfolio.setIndustries(new ArrayList<Industry>());
-                portfolio.setActive(resultSet.getBoolean("activePortfolio"));
-            }
-        } catch (SQLException e) {
-            LOGGER.error(e.getMessage());
-        } finally {
-            DBUtils.close(resultSet);
-            DBUtils.close(statement);
-            DBUtils.close(connection);
-        }
-        companyService.populatePortfolioCompanies(portfolio);
-        industryService.populatePortfolioIndustries(portfolio);
-        return portfolio;
-
-    }
 
     @Override
     public final List<String> getStreamTokens(final long id) {
@@ -292,5 +113,11 @@ public class PortfolioDAOImpl implements PortfolioDAO {
             DBUtils.close(connection);
         }
         return tokens;
+    }
+
+    @Override
+    public final void setDataSource(final DataSource dataSource) {
+        this.dataSource = dataSource;
+
     }
 }

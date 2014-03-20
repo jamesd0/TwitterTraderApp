@@ -1,7 +1,5 @@
 package org.dj.twittertrader.service.impl;
 
-import java.util.List;
-
 import org.dj.twittertrader.dao.UserDAO;
 import org.dj.twittertrader.model.User;
 import org.dj.twittertrader.service.UserService;
@@ -22,64 +20,13 @@ public class UserServiceImpl implements UserService {
     /*
      * (non-Javadoc)
      * 
-     * @see org.dj.twittertrader.service.UserService#selectAll()
-     */
-    @Override
-    @Transactional
-    public final List<User> selectAll() {
-        return userDAO.selectAll();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.dj.twittertrader.service.UserService#delete(org.dj.twittertrader.
-     * model.User)
-     */
-    @Override
-    @Transactional
-    public final void delete(final User user) {
-        userDAO.delete(user);
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.dj.twittertrader.service.UserService#create(org.dj.twittertrader.
-     * model.User)
+     * @see org.dj.twittertrader.service.UserService#create(org.dj.twittertrader. model.User)
      */
     @Override
     @Transactional
     public final void create(final User user) {
         userDAO.create(user);
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.dj.twittertrader.service.UserService#update(org.dj.twittertrader.
-     * model.User)
-     */
-    @Override
-    @Transactional
-    public final void update(final User user) {
-        userDAO.update(user);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.dj.twittertrader.service.UserService#select(long)
-     */
-    @Override
-    @Transactional
-    public final User select(final long id) {
-        return userDAO.select(id);
     }
 
     /**

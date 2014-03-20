@@ -174,13 +174,14 @@ public class TwitterStatusListenerTest {
         when(user.getLang()).thenReturn("en");
         when(google.getStreamTokens()).thenReturn(Arrays.asList("$goog", "Google"));
         when(apple.getStreamTokens()).thenReturn(Arrays.asList("$appl", "Apple"));
-        when(tagger.dealWithNewStatus(status, apple)).thenReturn(tweet);
+        when(tweetService.makeTweet(status)).thenReturn(tweet);
+        when(tagger.dealWithNewStatus(tweet, apple)).thenReturn(tweet);
         when(status.getText()).thenReturn("Apple");
         when(tweet.getUser()).thenReturn(trUser);
 
         listener.onStatus(status);
 
-        verify(tagger, times(1)).dealWithNewStatus(status, company2);
+        verify(tagger, times(1)).dealWithNewStatus(tweet, company2);
         verify(userService, times(1)).create(trUser);
         verify(tweetService, times(1)).create(tweet);
         verify(companyService, times(1)).addTweetToCompany(apple, tweet);
@@ -215,13 +216,14 @@ public class TwitterStatusListenerTest {
         when(apple.getStockSymbol()).thenReturn("aapl");
         when(apple.getStockPrice()).thenReturn(1022.10);
         when(apple.getIndustry()).thenReturn("tech");
-        when(tagger.dealWithNewStatus(status, apple)).thenReturn(tweet);
+        when(tweetService.makeTweet(status)).thenReturn(tweet);
+        when(tagger.dealWithNewStatus(tweet, apple)).thenReturn(tweet);
         when(status.getText()).thenReturn("Apple");
         when(tweet.getUser()).thenReturn(trUser);
 
         listener.onStatus(status);
 
-        verify(tagger, times(1)).dealWithNewStatus(status, company2);
+        verify(tagger, times(1)).dealWithNewStatus(tweet, company2);
         verify(userService, times(1)).create(trUser);
         verify(tweetService, times(1)).create(tweet);
         verify(companyService, times(1)).addTweetToCompany(apple, tweet);

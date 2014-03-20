@@ -45,7 +45,7 @@ public class Tweet {
      * @param status
      *            the status
      */
-    public Tweet(final Status status) {
+    public Tweet(Status status) {
         id = status.getId();
         createdAt = status.getCreatedAt();
         text = status.getText();
@@ -67,7 +67,7 @@ public class Tweet {
      * 
      * @return the id
      */
-    public final long getId() {
+    public long getId() {
         return id;
     }
 
@@ -77,7 +77,7 @@ public class Tweet {
      * @param id
      *            the new id
      */
-    public final void setId(final long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -86,7 +86,7 @@ public class Tweet {
      * 
      * @return the created at
      */
-    public final Date getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
@@ -96,7 +96,7 @@ public class Tweet {
      * @param createdAt
      *            the new created at
      */
-    public final void setCreatedAt(final Date createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -105,7 +105,7 @@ public class Tweet {
      * 
      * @return the text
      */
-    public final String getText() {
+    public String getText() {
         return text;
     }
 
@@ -115,7 +115,7 @@ public class Tweet {
      * @param text
      *            the new text
      */
-    public final void setText(final String text) {
+    public void setText(String text) {
         this.text = text;
     }
 
@@ -134,7 +134,7 @@ public class Tweet {
      * @param user
      *            the new user
      */
-    public final void setUser(final User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 
@@ -143,7 +143,7 @@ public class Tweet {
      * 
      * @return the retweet count
      */
-    public final long getRetweetCount() {
+    public long getRetweetCount() {
         return retweetCount;
     }
 
@@ -153,7 +153,7 @@ public class Tweet {
      * @param retweetCount
      *            the new retweet count
      */
-    public final void setRetweetCount(final long retweetCount) {
+    public void setRetweetCount(long retweetCount) {
         this.retweetCount = retweetCount;
     }
 
@@ -162,7 +162,7 @@ public class Tweet {
      * 
      * @return the tweet score
      */
-    public final double getTweetScore() {
+    public double getTweetScore() {
         return tweetScore;
     }
 
@@ -172,7 +172,7 @@ public class Tweet {
      * @param tweetScore
      *            the new tweet score
      */
-    public final void setTweetScore(final double tweetScore) {
+    public void setTweetScore(double tweetScore) {
         this.tweetScore = tweetScore;
     }
 
@@ -181,7 +181,7 @@ public class Tweet {
      * 
      * @return true, if is active
      */
-    public final boolean isActive() {
+    public boolean isActive() {
         return active;
     }
 
@@ -191,7 +191,7 @@ public class Tweet {
      * @param active
      *            the new active
      */
-    public final void setActive(final boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 
@@ -204,7 +204,7 @@ public class Tweet {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    public static Tweet fromJson(final String json) throws IOException {
+    public static Tweet fromJson(String json) throws IOException {
         return new ObjectMapper().readValue(json, Tweet.class);
     }
 
@@ -217,7 +217,7 @@ public class Tweet {
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    public static String toJson(final Tweet tweet) throws IOException {
+    public static String toJson(Tweet tweet) throws IOException {
         return new ObjectMapper().writeValueAsString(tweet);
     }
 
@@ -228,7 +228,7 @@ public class Tweet {
      *            the tweets
      * @return the latest tweets
      */
-    public static List<Tweet> getLatestTweets(final List<Tweet> tweets) {
+    public static List<Tweet> getLatestTweets(List<Tweet> tweets) {
         List<Tweet> list = new ArrayList<Tweet>();
         if (tweets.size() > 0) {
             Collections.sort(tweets, Collections.reverseOrder(new SortByTweetDate()));
@@ -252,7 +252,7 @@ public class Tweet {
      *            the tweets
      * @return the most influential tweets
      */
-    public static List<Tweet> getMostInfluentialTweets(final List<Tweet> tweets) {
+    public static List<Tweet> getMostInfluentialTweets(List<Tweet> tweets) {
         List<Tweet> list = new ArrayList<Tweet>();
         if (tweets.size() > 0) {
             Collections.sort(tweets, Collections.reverseOrder(new SortByTweetScore()));
@@ -276,7 +276,7 @@ public class Tweet {
      *            the tweets
      * @return the most detrimental tweets
      */
-    public static List<Tweet> getMostDetrimentalTweets(final List<Tweet> tweets) {
+    public static List<Tweet> getMostDetrimentalTweets(List<Tweet> tweets) {
         List<Tweet> list = new ArrayList<Tweet>();
         if (tweets.size() > 0) {
             Collections.sort(tweets, new SortByTweetScore());
@@ -294,8 +294,8 @@ public class Tweet {
     }
 
     @Override
-    public final int hashCode() {
-        final int prime = 31;
+    public int hashCode() {
+        int prime = 31;
         int result = 1;
         result = prime * result + (active ? 1231 : 1237);
         result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
@@ -310,7 +310,7 @@ public class Tweet {
     }
 
     @Override
-    public final boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }

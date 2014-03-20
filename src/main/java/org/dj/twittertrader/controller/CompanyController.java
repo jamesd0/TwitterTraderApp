@@ -7,14 +7,11 @@ import org.dj.twittertrader.service.CompanyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * The Class CompanyController is a REST api to control the Company Entity.
@@ -44,52 +41,16 @@ public class CompanyController {
     }
 
     /**
-     * Delete company.
+     * Gets all companies.
      * 
-     * @param company
-     *            the company to delete
-     */
-    @RequestMapping(value = "/deleteCompany", method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public final void deleteCompany(@RequestBody final Company company) {
-        companyService.delete(company);
-    }
-
-    /**
-     * Creates the company.
-     * 
-     * @param company
-     *            the company
-     */
-    @RequestMapping(value = "/createCompany", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public final void createCompany(@RequestBody final Company company) {
-        companyService.create(company);
-    }
-
-    /**
-     * Updates the company.
-     * 
-     * @param company
-     *            the updated company object
-     */
-    @RequestMapping(value = "/updateCompany", method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public final void updateCompany(@RequestBody final Company company) {
-        companyService.update(company);
-    }
-
-    /**
-     * Select company.
-     * 
-     * @param id
-     *            the id
-     * @return the string
+     * @return the all companies
      */
     @RequestMapping(value = "/getCompany/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public final Company selectCompany(@PathVariable final long id) {
-        return companyService.select(id);
+    public final Company getCompany(@PathVariable final int id) {
+        Company company = companyService.select(id);
+        LOGGER.info("Returned list of companies");
+        return company;
     }
 
     /**

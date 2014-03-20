@@ -70,33 +70,4 @@ public class CompanyServiceTest {
         verifyNoMoreInteractions(companyDAO);
     }
 
-    /**
-     * Test create.
-     */
-    @Test
-    public final void testCreate() {
-        companyService.create(first);
-        verify(companyDAO, times(1)).create(first);
-        verifyNoMoreInteractions(companyDAO);
-    }
-
-    /**
-     * Test delete.
-     */
-    @Test
-    public final void testDelete() {
-        companyService.delete(first);
-        verify(companyDAO, times(1)).delete(first);
-        verifyNoMoreInteractions(companyDAO);
-    }
-
-    /**
-     * Test update.
-     */
-    @Test
-    public final void testUpdate() {
-        companyService.update(first);
-        verify(companyDAO, times(1)).update(first);
-        verifyNoMoreInteractions(companyDAO);
-    }
 }

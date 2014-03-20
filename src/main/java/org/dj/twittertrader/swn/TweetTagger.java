@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import twitter4j.Status;
 import cmu.arktweetnlp.Tagger;
 import cmu.arktweetnlp.Twokenize;
 import cmu.arktweetnlp.impl.Model;
@@ -40,23 +39,23 @@ import com.swabunga.spell.engine.Word;
 public class TweetTagger extends Tagger {
 
     /** The Constant MIN_WORD_LENGTH. */
-    private static final int MIN_WORD_LENGTH = 3;
+    private static int MIN_WORD_LENGTH = 3;
 
     /** The Constant URL_REGEX. */
-    private static final String URL_REGEX = "<\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]"
+    private static String URL_REGEX = "<\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]"
             + "*[-a-zA-Z0-9+&@#/%=~_|]>";
 
     /** The Constant NO_OF_TOP_WORDS. */
-    private static final int NO_OF_TOP_WORDS = 50;
+    private static int NO_OF_TOP_WORDS = 50;
 
     /** The logger. */
     private Logger logger = LoggerFactory.getLogger(TweetTagger.class);
 
     /** The Constant MODEL_LOCATION. */
-    private static final String MODEL_LOCATION = "/modelTagger.txt";
+    private static String MODEL_LOCATION = "/modelTagger.txt";
 
     /** The Constant AVERAGE_RETWEET. */
-    private static final long AVERAGE_RETWEET = 1;
+    private static long AVERAGE_RETWEET = 1;
 
     /** The a tagger. */
     @Autowired
@@ -83,8 +82,57 @@ public class TweetTagger extends Tagger {
     @Autowired
     private SentimentClassifier classifier;
 
+    public Map<String, Map<String, Integer>> getTfIdf() {
+        return tfIdf;
+    }
+
+    public void setTfIdf(Map<String, Map<String, Integer>> tfIdf) {
+        this.tfIdf = tfIdf;
+    }
+
+    public StopAnalyser getStopAnalyser() {
+        return stopAnalyser;
+    }
+
+    public void setStopAnalyser(StopAnalyser stopAnalyser) {
+        this.stopAnalyser = stopAnalyser;
+    }
+
+    public SentimentClassifier getClassifier() {
+        return classifier;
+    }
+
+    public void setClassifier(SentimentClassifier classifier) {
+        this.classifier = classifier;
+    }
+
+    public Map<String, Integer> getDocumentFrequencyMap() {
+        return documentFrequencyMap;
+    }
+
+    public void setDocumentFrequencyMap(Map<String, Integer> documentFrequencyMap) {
+        this.documentFrequencyMap = documentFrequencyMap;
+    }
+
+    public Map<String, List<Map<String, Double>>> getPreviousTopWords() {
+        return previousTopWords;
+    }
+
+    public void setPreviousTopWords(Map<String, List<Map<String, Double>>> previousTopWords) {
+        this.previousTopWords = previousTopWords;
+    }
+
     /** The senti word net. */
-    private SentiWordNet sentiWordNet = new SentiWordNet();
+    @Autowired
+    private SentiWordNet sentiWordNet;
+
+    public SentiWordNet getSentiWordNet() {
+        return sentiWordNet;
+    }
+
+    public void setSentiWordNet(SentiWordNet sentiWordNet) {
+        this.sentiWordNet = sentiWordNet;
+    }
 
     /** The document frequency map. */
     private Map<String, Integer> documentFrequencyMap;
@@ -112,7 +160,7 @@ public class TweetTagger extends Tagger {
      * @see cmu.arktweetnlp.Tagger#tokenizeAndTag(java.lang.String)
      */
     @Override
-    public List<TaggedToken> tokenizeAndTag(final String text) {
+    public List<TaggedToken> tokenizeAndTag(String text) {
         if (model == null) {
             throw new RuntimeException("Must loadModel() first before tagging anything");
         }
@@ -161,31 +209,13 @@ public class TweetTagger extends Tagger {
     }
 
     /**
-     * The main method.
-     * 
-     * @param args
-     *            the arguments
-     * @throws IOException
-     *             Signals that an I/O exception has occurred.
-     */
-    public static void main(final String[] args) throws IOException {
-        TweetTagger tagger = new TweetTagger();
-        String text = "love hate good bad Duncan misery freedom m8 PMFJI";
-        List<TaggedToken> tokens = tagger.tokenizeAndTag(text);
-        for (TaggedToken token : tokens) {
-            System.out.println("Token: " + token.token + " tag: " + token.tag + " wordnettag: "
-                    + tagger.getWordNetTag(token.tag));
-        }
-    }
-
-    /**
      * Gets the word net tag.
      * 
      * @param tag
      *            the tag
      * @return the word net tag
      */
-    public final String getWordNetTag(final String tag) {
+    public String getWordNetTag(String tag) {
         if (tag.equals("N") || tag.equals("O") || tag.equals("^") || tag.equals("S")
                 || tag.equals("Z")) {
             return "n";
@@ -203,7 +233,7 @@ public class TweetTagger extends Tagger {
      * 
      * @return the acronym tagger
      */
-    public final AcronymTagger getAcronymTagger() {
+    public AcronymTagger getAcronymTagger() {
         return acronymTagger;
     }
 
@@ -213,7 +243,7 @@ public class TweetTagger extends Tagger {
      * @param acronymTagger
      *            the new acronym tagger
      */
-    public final void setAcronymTagger(final AcronymTagger acronymTagger) {
+    public void setAcronymTagger(AcronymTagger acronymTagger) {
         this.acronymTagger = acronymTagger;
     }
 
@@ -222,7 +252,7 @@ public class TweetTagger extends Tagger {
      * 
      * @return the spell checker manager
      */
-    public final SpellCheckerManager getSpellCheckerManager() {
+    public SpellCheckerManager getSpellCheckerManager() {
         return spellCheckerManager;
     }
 
@@ -232,7 +262,7 @@ public class TweetTagger extends Tagger {
      * @param spellCheckerManager
      *            the new spell checker manager
      */
-    public final void setSpellCheckerManager(final SpellCheckerManager spellCheckerManager) {
+    public void setSpellCheckerManager(SpellCheckerManager spellCheckerManager) {
         this.spellCheckerManager = spellCheckerManager;
     }
 
@@ -243,7 +273,7 @@ public class TweetTagger extends Tagger {
      *            the tweet
      * @return the list
      */
-    public final List<TaggedToken> tokenise(final Tweet tweet) {
+    public List<TaggedToken> tokenise(Tweet tweet) {
         return tokenizeAndTag(tweet.getText());
     }
 
@@ -254,7 +284,7 @@ public class TweetTagger extends Tagger {
      *            the text
      * @return the tweet score
      */
-    public final double getTweetScore(final Tweet tweet) {
+    public double getTweetScore(Tweet tweet) {
         double score = 0;
         score = classifier.classify(tweet.getText());
         score *= tweet.getUser().getUserScore();
@@ -269,7 +299,7 @@ public class TweetTagger extends Tagger {
      *            the tweet
      * @return the score of string
      */
-    public final double getScoreOfString(final String tweet) {
+    public double getScoreOfString(String tweet) {
         return classifier.classify(tweet);
     }
 
@@ -280,7 +310,7 @@ public class TweetTagger extends Tagger {
      *            the tweet
      * @return the dictionary lookup score of string
      */
-    public final double getDictionaryLookupScoreOfString(final String tweet) {
+    public double getDictionaryLookupScoreOfString(String tweet) {
         double score = 0;
         List<TaggedToken> tokens = tokenizeAndTag(tweet);
         for (TaggedToken token : tokens) {
@@ -297,7 +327,7 @@ public class TweetTagger extends Tagger {
      * @param company
      *            the company
      */
-    public final void addTokensToMap(final List<TaggedToken> tokens, final Company company) {
+    public void addTokensToMap(List<TaggedToken> tokens, Company company) {
         if (!tfIdf.containsKey(company.getStockSymbol())) {
             tfIdf.put(company.getStockSymbol(), new HashMap<String, Integer>());
         }
@@ -331,7 +361,7 @@ public class TweetTagger extends Tagger {
      *            the token
      * @return true, if is removable word
      */
-    private boolean isRemovableWord(final String token) {
+    private boolean isRemovableWord(String token) {
         Pattern pattern = Pattern.compile(URL_REGEX);
         Matcher matcher = pattern.matcher(token);
         if (matcher.matches()) {
@@ -354,7 +384,7 @@ public class TweetTagger extends Tagger {
      * @return the top words
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public final List<Map<String, Double>> getTopWords(final Company company) {
+    public List<Map<String, Double>> getTopWords(Company company) {
         List<Map<String, Double>> topWords = new ArrayList<Map<String, Double>>();
         Map<String, Double> termToTfIdf = new TreeMap<String, Double>();
         Map<String, Integer> tokenMap = tfIdf.get(company.getStockSymbol());
@@ -370,7 +400,7 @@ public class TweetTagger extends Tagger {
         Collections.sort(entrySet, new Comparator() {
 
             @Override
-            public int compare(final Object o1, final Object o2) {
+            public int compare(Object o1, Object o2) {
                 return ((Entry<String, Double>) o1).getValue().compareTo(
                         ((Entry<String, Double>) o2).getValue());
             }
@@ -399,7 +429,7 @@ public class TweetTagger extends Tagger {
      *            the token
      * @return the int
      */
-    private int calculateDocumentFrequency(final String token) {
+    private int calculateDocumentFrequency(String token) {
         return documentFrequencyMap.get(token);
     }
 
@@ -409,7 +439,7 @@ public class TweetTagger extends Tagger {
      * @param model
      *            the new model
      */
-    public final void setModel(final Model model) {
+    public void setModel(Model model) {
         this.model = model;
 
     }
@@ -417,14 +447,13 @@ public class TweetTagger extends Tagger {
     /**
      * Deal with new status.
      * 
-     * @param status
-     *            the status
+     * @param tweet
+     *            the tweet
      * @param company
      *            the company
      * @return the tweet
      */
-    public Tweet dealWithNewStatus(final Status status, final Company company) {
-        Tweet tweet = new Tweet(status);
+    public Tweet dealWithNewStatus(Tweet tweet, Company company) {
         List<TaggedToken> tokens = tokenise(tweet);
         tweet.setTweetScore(getTweetScore(tweet));
         addTokensToMap(tokens, company);
@@ -444,5 +473,117 @@ public class TweetTagger extends Tagger {
             e.printStackTrace();
         }
         return tweet;
+    }
+
+    public MessagingBroker getBroker() {
+        return broker;
+    }
+
+    public void setBroker(MessagingBroker broker) {
+        this.broker = broker;
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 31;
+        int result = 1;
+        result = prime * result + ((acronymTagger == null) ? 0 : acronymTagger.hashCode());
+        result = prime * result + ((broker == null) ? 0 : broker.hashCode());
+        result = prime * result + ((classifier == null) ? 0 : classifier.hashCode());
+        result = prime * result
+                + ((documentFrequencyMap == null) ? 0 : documentFrequencyMap.hashCode());
+        result = prime * result + ((logger == null) ? 0 : logger.hashCode());
+        result = prime * result + ((previousTopWords == null) ? 0 : previousTopWords.hashCode());
+        result = prime * result + ((sentiWordNet == null) ? 0 : sentiWordNet.hashCode());
+        result = prime * result
+                + ((spellCheckerManager == null) ? 0 : spellCheckerManager.hashCode());
+        result = prime * result + ((stopAnalyser == null) ? 0 : stopAnalyser.hashCode());
+        result = prime * result + ((tfIdf == null) ? 0 : tfIdf.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof TweetTagger)) {
+            return false;
+        }
+        TweetTagger other = (TweetTagger) obj;
+        if (acronymTagger == null) {
+            if (other.acronymTagger != null) {
+                return false;
+            }
+        } else if (!acronymTagger.equals(other.acronymTagger)) {
+            return false;
+        }
+        if (broker == null) {
+            if (other.broker != null) {
+                return false;
+            }
+        } else if (!broker.equals(other.broker)) {
+            return false;
+        }
+        if (classifier == null) {
+            if (other.classifier != null) {
+                return false;
+            }
+        } else if (!classifier.equals(other.classifier)) {
+            return false;
+        }
+        if (documentFrequencyMap == null) {
+            if (other.documentFrequencyMap != null) {
+                return false;
+            }
+        } else if (!documentFrequencyMap.equals(other.documentFrequencyMap)) {
+            return false;
+        }
+        if (logger == null) {
+            if (other.logger != null) {
+                return false;
+            }
+        } else if (!logger.equals(other.logger)) {
+            return false;
+        }
+        if (previousTopWords == null) {
+            if (other.previousTopWords != null) {
+                return false;
+            }
+        } else if (!previousTopWords.equals(other.previousTopWords)) {
+            return false;
+        }
+        if (sentiWordNet == null) {
+            if (other.sentiWordNet != null) {
+                return false;
+            }
+        } else if (!sentiWordNet.equals(other.sentiWordNet)) {
+            return false;
+        }
+        if (spellCheckerManager == null) {
+            if (other.spellCheckerManager != null) {
+                return false;
+            }
+        } else if (!spellCheckerManager.equals(other.spellCheckerManager)) {
+            return false;
+        }
+        if (stopAnalyser == null) {
+            if (other.stopAnalyser != null) {
+                return false;
+            }
+        } else if (!stopAnalyser.equals(other.stopAnalyser)) {
+            return false;
+        }
+        if (tfIdf == null) {
+            if (other.tfIdf != null) {
+                return false;
+            }
+        } else if (!tfIdf.equals(other.tfIdf)) {
+            return false;
+        }
+        return true;
     }
 }

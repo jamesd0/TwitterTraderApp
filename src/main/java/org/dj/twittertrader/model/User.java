@@ -112,7 +112,7 @@ public class User {
      * 
      * @return the id
      */
-    public final long getId() {
+    public long getId() {
         return id;
     }
 
@@ -131,7 +131,7 @@ public class User {
      * 
      * @return the name
      */
-    public final String getName() {
+    public String getName() {
         return name;
     }
 
@@ -150,7 +150,7 @@ public class User {
      * 
      * @return the screen name
      */
-    public final String getScreenName() {
+    public String getScreenName() {
         return screenName;
     }
 
@@ -169,7 +169,7 @@ public class User {
      * 
      * @return the followers count
      */
-    public final int getFollowersCount() {
+    public int getFollowersCount() {
         return followersCount;
     }
 
@@ -188,7 +188,7 @@ public class User {
      * 
      * @return the friends count
      */
-    public final int getFriendsCount() {
+    public int getFriendsCount() {
         return friendsCount;
     }
 
@@ -207,7 +207,7 @@ public class User {
      * 
      * @return the favourites count
      */
-    public final int getFavouritesCount() {
+    public int getFavouritesCount() {
         return favouritesCount;
     }
 
@@ -226,7 +226,7 @@ public class User {
      * 
      * @return true, if is verified
      */
-    public final boolean isVerified() {
+    public boolean isVerified() {
         return verified;
     }
 
@@ -245,7 +245,7 @@ public class User {
      * 
      * @return the lang
      */
-    public final String getLang() {
+    public String getLang() {
         return lang;
     }
 
@@ -264,7 +264,7 @@ public class User {
      * 
      * @return the created at
      */
-    public final Date getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
@@ -283,7 +283,7 @@ public class User {
      * 
      * @return the location
      */
-    public final String getLocation() {
+    public String getLocation() {
         return location;
     }
 
@@ -302,7 +302,7 @@ public class User {
      * 
      * @return the user score
      */
-    public final double getUserScore() {
+    public double getUserScore() {
         return userScore;
     }
 
@@ -321,7 +321,7 @@ public class User {
      * 
      * @return true, if is active
      */
-    public final boolean isActive() {
+    public boolean isActive() {
         return active;
     }
 

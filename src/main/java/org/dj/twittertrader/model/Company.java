@@ -98,7 +98,7 @@ public class Company {
      * 
      * @return the id
      */
-    public final long getId() {
+    public long getId() {
         return id;
     }
 

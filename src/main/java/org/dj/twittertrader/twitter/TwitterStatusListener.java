@@ -140,7 +140,8 @@ public class TwitterStatusListener implements StatusListener {
                 for (String tag : company.getStreamTokens()) {
                     if (status.getText().contains(tag)) {
                         // entity identification
-                        Tweet tweet = tagger.dealWithNewStatus(status, company);
+                        Tweet tweet = tagger.dealWithNewStatus(tweetService.makeTweet(status),
+                                company);
                         // adding user to db
                         userService.create(tweet.getUser());
                         // adding tweet to db

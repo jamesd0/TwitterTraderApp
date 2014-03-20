@@ -1,6 +1,6 @@
 package org.dj.twittertrader.dao;
 
-import java.util.List;
+import javax.sql.DataSource;
 
 import org.dj.twittertrader.model.Tweet;
 
@@ -8,21 +8,6 @@ import org.dj.twittertrader.model.Tweet;
  * The Interface TweetDAO.
  */
 public interface TweetDAO {
-
-    /**
-     * Select all.
-     * 
-     * @return the list
-     */
-    List<Tweet> selectAll();
-
-    /**
-     * Delete.
-     * 
-     * @param tweet
-     *            the tweet
-     */
-    void delete(Tweet tweet);
 
     /**
      * Creates the.
@@ -33,20 +18,11 @@ public interface TweetDAO {
     void create(Tweet tweet);
 
     /**
-     * Update.
+     * Sets the data source.
      * 
-     * @param tweet
-     *            the tweet
+     * @param dataSource
+     *            the new data source
      */
-    void update(Tweet tweet);
-
-    /**
-     * Select.
-     * 
-     * @param id
-     *            the id
-     * @return the tweet
-     */
-    Tweet select(long id);
+    void setDataSource(DataSource dataSource);
 
 }

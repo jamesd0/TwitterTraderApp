@@ -5,10 +5,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.dj.twittertrader.model.Company;
-import org.dj.twittertrader.model.Industry;
-import org.dj.twittertrader.model.Portfolio;
 import org.dj.twittertrader.model.Tweet;
-import org.dj.twittertrader.service.TweetService;
 
 /**
  * This interface is the DAO for the Company entity. It provides an abstraction layer to a database
@@ -33,30 +30,6 @@ public interface CompanyDAO {
     Company select(long id);
 
     /**
-     * Creates a company in the database.
-     * 
-     * @param company
-     *            the company
-     */
-    void create(Company company);
-
-    /**
-     * Updates the company in the database.
-     * 
-     * @param company
-     *            the company
-     */
-    void update(Company company);
-
-    /**
-     * Deletes the company from the database.
-     * 
-     * @param company
-     *            the company
-     */
-    void delete(Company company);
-
-    /**
      * Adds the tweet to company.
      * 
      * @param company
@@ -73,30 +46,6 @@ public interface CompanyDAO {
      *            the new data source
      */
     void setDataSource(DataSource dataSource);
-
-    /**
-     * Sets the tweet service.
-     * 
-     * @param tweetService
-     *            the new tweet service
-     */
-    void setTweetService(TweetService tweetService);
-
-    /**
-     * Populate portfolio companies.
-     * 
-     * @param portfolio
-     *            the portfolio
-     */
-    void populatePortfolioCompanies(Portfolio portfolio);
-
-    /**
-     * Populate industry companies.
-     * 
-     * @param industry
-     *            the industry
-     */
-    void populateIndustryCompanies(Industry industry);
 
     /**
      * Adds the stock price.

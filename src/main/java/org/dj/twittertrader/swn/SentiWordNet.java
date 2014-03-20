@@ -98,7 +98,7 @@ public class SentiWordNet {
      *            the pos
      * @return the double
      */
-    public final Double extract(final String word, final String pos) {
+    public Double extract(final String word, final String pos) {
         Double score = dictionary.get(word + "#" + pos);
         if (score == null) {
             score = (double) 0;
